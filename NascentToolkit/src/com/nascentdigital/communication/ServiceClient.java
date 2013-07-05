@@ -1,11 +1,10 @@
 package com.nascentdigital.communication;
 
+
 import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-
 import com.nascentdigital.common.ILog;
 import com.nascentdigital.common.NullLogger;
 import com.nascentdigital.threading.PriorityThreadPoolExecutor;
@@ -15,31 +14,31 @@ public class ServiceClient{
 	
 	// [region] class variables
 	
-	private static final Comparator<ServiceOperation> _operationTaskComparator;
+	private static final Comparator<ServiceOperation<?,?>> _operationTaskComparator;
 	
 	// [endregion]
 	
 	// [region] instance variables
-	private PriorityThreadPoolExecutor<ServiceOperation> requestQueue;
-	private long requestTimeoutInMilliseconds;
-	private ILog logger;
+	private PriorityThreadPoolExecutor<ServiceOperation<?,?>> _requestPool;
+	private int _requestTimeoutInMilliseconds;
+	private ILog _logger;
 	// [endregion]
 	
 	// [region] getter/setter methods
-	public PriorityThreadPoolExecutor<ServiceOperation> getRequestQueue() {
-		return requestQueue;
+	public PriorityThreadPoolExecutor<ServiceOperation<?,?>> getRequestPool() {
+		return _requestPool;
 	}
 
 	public long getRequestTimeoutInMilliseconds() {
-		return requestTimeoutInMilliseconds;
+		return _requestTimeoutInMilliseconds;
 	}
 
-	public void setRequestTimeoutInMilliseconds(long requestTimeoutInMilliseconds) {
-		this.requestTimeoutInMilliseconds = requestTimeoutInMilliseconds;
+	public void setRequestTimeoutInMilliseconds(int requestTimeoutInMilliseconds) {
+		this._requestTimeoutInMilliseconds = requestTimeoutInMilliseconds;
 	}
 	
 	public ILog getLogger() {
-		return logger;
+		return _logger;
 	}
 
 	public void setLogger(ILog logger) {
@@ -47,7 +46,7 @@ public class ServiceClient{
 		{
 			logger = new NullLogger();
 		}
-		this.logger = logger;
+		this._logger = logger;
 	}
 	// [endregion]
 	
@@ -55,11 +54,11 @@ public class ServiceClient{
 	
 	static 
 	{
-		_operationTaskComparator = new Comparator<ServiceOperation>()
+		_operationTaskComparator = new Comparator<ServiceOperation<?,?>>()
 			{
 			@Override
-			public int compare(ServiceOperation lhs,
-				ServiceOperation rhs)
+			public int compare(ServiceOperation<?,?> lhs,
+				ServiceOperation<?,?> rhs)
 			{
 				int result = rhs.priority.getIntValue() - lhs.priority.getIntValue();
 				if (result == 0)
@@ -86,13 +85,13 @@ public class ServiceClient{
 	}
 	
 	public ServiceClient (int maxConcurrentCount, 
-		long requestTimeoutInMilliseconds)
+		int requestTimeoutInMilliseconds)
 	{
 		this(maxConcurrentCount, ServiceClientConstants.MAX_POOL_SIZE, ServiceClientConstants.POOL_KEEP_ALIVE_SECONDS, requestTimeoutInMilliseconds, new NullLogger());
 	}
 	
 	public ServiceClient (int maxConcurrentCount, 
-		long requestTimeoutInMilliseconds, 
+		int requestTimeoutInMilliseconds, 
 		ILog logger)
 	{
 		this(maxConcurrentCount, ServiceClientConstants.MAX_POOL_SIZE, ServiceClientConstants.POOL_KEEP_ALIVE_SECONDS, requestTimeoutInMilliseconds, logger);
@@ -102,15 +101,18 @@ public class ServiceClient{
 		(int maxConcurrentCount,
 		int maxPoolSize, 
 		long poolKeepAliveSeconds,
-		long requestTimeoutInMilliseconds,
+		int requestTimeoutInMilliseconds,
 		ILog logger)
 	{
-		// FIXME: pull out magic number as constant
-		this.requestQueue = new PriorityThreadPoolExecutor<ServiceOperation>(maxConcurrentCount, maxPoolSize, poolKeepAliveSeconds, TimeUnit.SECONDS, 
-			new PriorityBlockingQueue<ServiceOperation>(16, _operationTaskComparator));
+		this._requestPool = 
+			new PriorityThreadPoolExecutor<ServiceOperation<?,?>>(maxConcurrentCount, 
+				maxPoolSize, 
+				poolKeepAliveSeconds, 
+				TimeUnit.SECONDS, 
+				new PriorityBlockingQueue<ServiceOperation<?,?>>(ServiceClientConstants.DEFAULT_QUEUE_SIZE, _operationTaskComparator));
 		
 		setLogger( logger);
-		this.requestTimeoutInMilliseconds = requestTimeoutInMilliseconds;
+		this._requestTimeoutInMilliseconds = requestTimeoutInMilliseconds;
 
 	}
 	
@@ -119,14 +121,14 @@ public class ServiceClient{
 	// [region] public methods
 	
 	
-	public <T> ServiceOperation beginRequest (String uri,
+	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest (String uri,
 			ServiceMethod method,
 			Map<String, String> headers,
 			Map<String, String> queryParameters,
 			String body,
-			ServiceFormat responseFormat,
-			IResponseTransform<T> responseTransform,
-			IServiceClientCompletion<T> completion)
+			ServiceResponseFormat<TResponse> responseFormat,
+			IResponseTransform<TResponse, TResult> responseTransform,
+			IServiceClientCompletion<TResult> completion)
 	{
 		return this.beginRequest(uri, 
 				method, 
@@ -140,14 +142,14 @@ public class ServiceClient{
 				false);
 	}
 	
-	public <T> ServiceOperation beginRequest (String uri,
+	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest (String uri,
 			ServiceMethod method,
 			Map<String, String> headers,
 			Map<String, String> queryParameters,
 			String body,
-			ServiceFormat responseFormat,
-			IResponseTransform<T> responseTransform,
-			IServiceClientCompletion<T> completion,
+			ServiceResponseFormat<TResponse> responseFormat,
+			IResponseTransform<TResponse,TResult> responseTransform,
+			IServiceClientCompletion<TResult> completion,
 			ServiceOperationPriority priority,
 			boolean useCaches)
 	
@@ -170,14 +172,14 @@ public class ServiceClient{
 				useCaches);
 	}
 	
-	public <T> ServiceOperation beginRequest (String uri,
+	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest (String uri,
 			ServiceMethod method,
 			Map<String, String> headers,
 			Map<String, String> queryParameters,
 			byte[] bodyData,
-			ServiceFormat responseFormat,
-			IResponseTransform<T> responseTransform,
-			IServiceClientCompletion<T> completion)
+			ServiceResponseFormat<TResponse> responseFormat,
+			IResponseTransform<TResponse,TResult> responseTransform,
+			IServiceClientCompletion<TResult> completion)
 	{
 		return this.beginRequest(uri, 
 				method, 
@@ -191,14 +193,14 @@ public class ServiceClient{
 				false);
 	}
 	
-	public <T> ServiceOperation beginRequest (String uri,
+	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest (String uri,
 			ServiceMethod method,
 			Map<String, String> headers,
 			Map<String, String> queryParameters,
 			byte[] bodyData,
-			ServiceFormat responseFormat,
-			IResponseTransform<T> responseTransform,
-			IServiceClientCompletion<T> completion,
+			ServiceResponseFormat<TResponse> responseFormat,
+			IResponseTransform<TResponse,TResult> responseTransform,
+			IServiceClientCompletion<TResult> completion,
 			ServiceOperationPriority priority,
 			boolean useCaches)
 	
@@ -222,29 +224,45 @@ public class ServiceClient{
 	}
 	
 	
-	public <T> ServiceOperation beginRequest (String uri,
+	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest (String uri,
 			ServiceMethod method,
 			Map<String, String> headers,
 			Map<String, String> queryParameters,
 			IBodyDataProvider bodyDataProvider,
-			ServiceFormat responseFormat,
-			IResponseTransform<T> responseTransform,
-			IServiceClientCompletion<T> completion,
+			ServiceResponseFormat<TResponse> responseFormat,
+			IResponseTransform<TResponse,TResult> responseTransform,
+			IServiceClientCompletion<TResult> completion,
 			ServiceOperationPriority priority,
 			boolean useCaches)
 	{
 		
-		//TODO: Implementation
+		ServiceOperation<TResponse, TResult> serviceOperation = 
+			new ServiceOperation<TResponse, TResult>(uri, 
+				method,
+				headers,
+				queryParameters,
+				bodyDataProvider,
+				responseFormat,
+				responseTransform,
+				completion,
+				priority,
+				useCaches,
+				this._requestTimeoutInMilliseconds,
+				this);
+		this._requestPool.execute(serviceOperation);
 		
-		return null;
+		return serviceOperation;
 	}
 	
 	
 	
-	public Object transformDataIntoIntermediateFormat (ServiceOperation serviceOperation,
+	public <TResponse> TResponse transformDataIntoResponseFormat (ServiceOperation<TResponse, ?> serviceOperation,
 			byte[] data,
-			ServiceFormat format)
+			ServiceResponseFormat<TResponse> format)
 	{
+		
+		
+		//TODO: Implementation
 		return null;
 	}
 				
@@ -252,25 +270,24 @@ public class ServiceClient{
 	
 	// [region] protected methods
 	
-	protected void serviceOperationDidBegin (ServiceOperation serviceOperation)
+	protected void serviceOperationDidBegin (ServiceOperation<?,?> serviceOperation)
 	{
 		
 	}
 	
-	protected void serviceOperationDidEnd (ServiceOperation serviceOperation)
+	protected void serviceOperationDidEnd (ServiceOperation<?,?> serviceOperation)
 	{
 		
 	}
 	
-	protected boolean serviceOperationShouldRetry (ServiceOperation serviceOperation, 
-			ServiceResult result, 
-			byte[] data, 
+	protected boolean serviceOperationShouldRetry (ServiceOperation<?,?> serviceOperation, 
+			int responseCode, 
 			int retryCount)
 	{
 		return false;
 	}
 	
-	protected void serviceOperationFailed (ServiceOperation serviceOperation)
+	protected void serviceOperationFailed (ServiceOperation<?,?> serviceOperation, Exception ex)
 	{
 		
 	}
