@@ -1,10 +1,18 @@
 package com.nascentdigital.communication;
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import com.nascentdigital.common.ILog;
 import com.nascentdigital.common.NullLogger;
 import com.nascentdigital.threading.PriorityThreadPoolExecutor;
@@ -257,15 +265,82 @@ public class ServiceClient{
 	
 	
 	public <TResponse> TResponse transformDataIntoResponseFormat (ServiceOperation<TResponse, ?> serviceOperation,
-			byte[] data,
+			byte[] responseData,
 			ServiceResponseFormat<TResponse> format)
 	{
+		// deserialize response
+			Object data;
+			try
+			{
+				switch (format.type)
+				{
+					case RAW:
+						data = responseData;
+						break;
+	
+					case STRING:
+						
+						data = new String(responseData, "UTF-8");
+						break;
+	
+					case FORM_ENCODED:
+						data = deserializeQueryString(responseData);
+						
+						break;
+	
+					case JSON:
+						data = deserializeJson(responseData);
+						break;
+	
+					case GSON:
+						data = deserializeGson(responseData);
+						break;
+	
+					default:
+						throw new UnsupportedOperationException(
+							"Unexpected response format: " + format);
+				}
+			}
+			catch (UnsupportedEncodingException e)
+			{
+				this._logger.e(this.getClass().getName(), "Invalid encoding used.", e);
+				return null;
+			}
 		
+
+		return (TResponse) data;
+	}
+	
+	private Object deserializeQueryString(byte[] responseData) throws UnsupportedEncodingException
+	{
+		String queryString = new String(responseData, "UTF-8");
 		
-		//TODO: Implementation
-		return null;
+
+	    Map<String, String> mappedQueryString = new HashMap<String, String>();
+	    if (queryString == null || queryString.length() == 0) {
+	        return mappedQueryString;
+	    }
+	    List<NameValuePair> list = URLEncodedUtils.parse(URI.create("http://localhost/?" + queryString), "UTF-8");
+	    for (NameValuePair pair : list) {
+	    	mappedQueryString.put(pair.getName(), pair.getValue());
+	    }
+
+	    return mappedQueryString;
+		
 	}
 				
+	private Object deserializeGson(byte[] responseData)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Object deserializeJson(byte[] responseData)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	// [endregion]
 	
 	// [region] protected methods
