@@ -2,6 +2,7 @@ package com.nascentdigital.communication;
 
 import java.util.Map;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
 import com.google.gson.JsonElement;
 
 
@@ -15,6 +16,7 @@ public abstract class ServiceResponseFormat<T>
 		new FormEncodedFormat();
 	public static final ServiceResponseFormat<JSONObject> JSON = new JsonFormat();
 	public static final ServiceResponseFormat<JsonElement> GSON = new GsonFormat();
+	public static final ServiceResponseFormat<Document> XML = new XmlFormat();
 
 	// [endregion]
 
@@ -40,7 +42,7 @@ public abstract class ServiceResponseFormat<T>
 
 	protected enum Type
 	{
-		RAW, STRING, FORM_ENCODED, JSON, GSON
+		RAW, STRING, FORM_ENCODED, JSON, GSON, XML
 
 	} // Type
 
@@ -109,6 +111,20 @@ public abstract class ServiceResponseFormat<T>
 		private GsonFormat()
 		{
 			super(Type.GSON);
+		}
+
+		// [endregion]
+
+	} // class GsonFormat
+	
+	private static final class XmlFormat extends ServiceResponseFormat<Document>
+	{
+
+		// [region] constructors
+
+		private XmlFormat()
+		{
+			super(Type.XML);
 		}
 
 		// [endregion]

@@ -1,20 +1,28 @@
 package com.nascentdigital.communication;
 
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.nascentdigital.threading.PriorityThreadPoolExecutor;
 
 
@@ -22,7 +30,7 @@ public class ServiceClient
 {
 
 	// [region] class variables
-
+	
 	private static final Comparator<ServiceOperation<?, ?>> _operationTaskComparator;
 
 	// [endregion]
@@ -206,8 +214,8 @@ public class ServiceClient
 			byte[] responseData,
 			ServiceResponseFormat<TResponse> format)
 	{
-		// deserialize response
-			Object data;
+			// deserialize response
+			Object data = null;
 			try
 			{
 				switch (format.type)
@@ -216,14 +224,12 @@ public class ServiceClient
 						data = responseData;
 						break;
 	
-					case STRING:
-						
-						data = new String(responseData, "UTF-8");
+					case STRING:					
+						data = new String(responseData, ServiceClientConstants.UTF8_ENCODING);
 						break;
 	
 					case FORM_ENCODED:
-						data = deserializeQueryString(responseData);
-						
+						data = deserializeQueryString(responseData);						
 						break;
 	
 					case JSON:
@@ -232,6 +238,10 @@ public class ServiceClient
 	
 					case GSON:
 						data = deserializeGson(responseData);
+						break;
+						
+					case XML:
+						data = deserializeXml(responseData);
 						break;
 	
 					default:
@@ -244,14 +254,43 @@ public class ServiceClient
 				//this._logger.e(this.getClass().getName(), "Invalid encoding used.", e);
 				return null;
 			}
-		
+			catch (JSONException e)
+			{
+				//this._logger.e(this.getClass().getName(), "Error Parsing JSON", e);
+				return null;
+			}
+			catch (ParserConfigurationException e)
+			{
+				//this._logger.e(this.getClass().getName(), "Error Parsing XML", e);
+				e.printStackTrace();
+			}
+			catch (SAXException e)
+			{
+				//this._logger.e(this.getClass().getName(), "Error Parsing XML", e);
+				return null;
+			}
+			catch (IOException e)
+			{
+				//this._logger.e(this.getClass().getName(), "Error Parsing XML", e);
+				return null;
+			}
 
-		return (TResponse) data;
+		@SuppressWarnings("unchecked")
+		TResponse result = (TResponse) data;
+		return result;
 	}
 	
-	private Object deserializeQueryString(byte[] responseData) throws UnsupportedEncodingException
+	private static final Document deserializeXml(byte[] responseData) throws ParserConfigurationException, SAXException, IOException
 	{
-		String queryString = new String(responseData, "UTF-8");
+		DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();		
+		Document document = documentBuilder.parse(new ByteArrayInputStream(responseData));
+
+		return document;
+	}
+
+	private static final Map<String, String> deserializeQueryString(byte[] responseData) throws UnsupportedEncodingException
+	{
+		String queryString = new String(responseData, ServiceClientConstants.UTF8_ENCODING);
 		
 
 	    Map<String, String> mappedQueryString = new HashMap<String, String>();
@@ -263,22 +302,24 @@ public class ServiceClient
 	    	mappedQueryString.put(pair.getName(), pair.getValue());
 	    }
 
-	    return mappedQueryString;
-		
+	    return mappedQueryString;		
 	}
-				
-	private Object deserializeGson(byte[] responseData)
+	
+	private static final JSONObject deserializeJson(byte[] responseData)
+		throws JSONException, UnsupportedEncodingException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		String json = new String(responseData, ServiceClientConstants.UTF8_ENCODING);
+		JSONTokener jsonParser = new JSONTokener(json);
+		return (JSONObject)jsonParser.nextValue();
 	}
 
-	private Object deserializeJson(byte[] responseData)
+	private static final JsonElement deserializeGson(byte[] responseData) 
+		throws UnsupportedEncodingException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		String json = new String(responseData, ServiceClientConstants.UTF8_ENCODING);
+		JsonParser jsonParser = new JsonParser();
+		return jsonParser.parse(json);
 	}
-
 
 	// [endregion]
 
