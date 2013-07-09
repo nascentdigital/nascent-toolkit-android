@@ -24,6 +24,7 @@ import org.xml.sax.SAXException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.nascentdigital.threading.PriorityThreadPoolExecutor;
+import com.nascentdigital.util.Logger;
 
 
 public class ServiceClient
@@ -126,8 +127,8 @@ public class ServiceClient
 		String uri, ServiceMethod method, Map<String, String> headers,
 		Map<String, String> queryParameters, String body,
 		ServiceResponseFormat<TResponse> responseFormat,
-		IResponseTransform<TResponse, TResult> responseTransform,
-		IServiceClientCompletion<TResult> completion)
+		ResponseTransform<TResponse, TResult> responseTransform,
+		ServiceClientCompletion<TResult> completion)
 	{
 		return this.beginRequest(uri, method, headers, queryParameters, body,
 			responseFormat, responseTransform, completion,
@@ -138,8 +139,8 @@ public class ServiceClient
 		String uri, ServiceMethod method, Map<String, String> headers,
 		Map<String, String> queryParameters, String body,
 		ServiceResponseFormat<TResponse> responseFormat,
-		IResponseTransform<TResponse, TResult> responseTransform,
-		IServiceClientCompletion<TResult> completion,
+		ResponseTransform<TResponse, TResult> responseTransform,
+		ServiceClientCompletion<TResult> completion,
 		ServiceOperationPriority priority, boolean useCaches)
 
 	{
@@ -158,8 +159,8 @@ public class ServiceClient
 		String uri, ServiceMethod method, Map<String, String> headers,
 		Map<String, String> queryParameters, byte[] bodyData,
 		ServiceResponseFormat<TResponse> responseFormat,
-		IResponseTransform<TResponse, TResult> responseTransform,
-		IServiceClientCompletion<TResult> completion)
+		ResponseTransform<TResponse, TResult> responseTransform,
+		ServiceClientCompletion<TResult> completion)
 	{
 		return this.beginRequest(uri, method, headers, queryParameters,
 			bodyData, responseFormat, responseTransform, completion,
@@ -170,8 +171,8 @@ public class ServiceClient
 		String uri, ServiceMethod method, Map<String, String> headers,
 		Map<String, String> queryParameters, byte[] bodyData,
 		ServiceResponseFormat<TResponse> responseFormat,
-		IResponseTransform<TResponse, TResult> responseTransform,
-		IServiceClientCompletion<TResult> completion,
+		ResponseTransform<TResponse, TResult> responseTransform,
+		ServiceClientCompletion<TResult> completion,
 		ServiceOperationPriority priority, boolean useCaches)
 
 	{
@@ -190,10 +191,10 @@ public class ServiceClient
 	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
 		String uri, ServiceMethod method, Map<String, String> headers,
 		Map<String, String> queryParameters,
-		IBodyDataProvider bodyDataProvider,
+		BodyDataProvider bodyDataProvider,
 		ServiceResponseFormat<TResponse> responseFormat,
-		IResponseTransform<TResponse, TResult> responseTransform,
-		IServiceClientCompletion<TResult> completion,
+		ResponseTransform<TResponse, TResult> responseTransform,
+		ServiceClientCompletion<TResult> completion,
 		ServiceOperationPriority priority, boolean useCaches)
 	{
 
@@ -251,27 +252,27 @@ public class ServiceClient
 			}
 			catch (UnsupportedEncodingException e)
 			{
-				//this._logger.e(this.getClass().getName(), "Invalid encoding used.", e);
+				Logger.e(this.getClass().getName(), "Invalid encoding used.", e);
 				return null;
 			}
 			catch (JSONException e)
 			{
-				//this._logger.e(this.getClass().getName(), "Error Parsing JSON", e);
+				Logger.e(this.getClass().getName(), "Error Parsing JSON", e);
 				return null;
 			}
 			catch (ParserConfigurationException e)
 			{
-				//this._logger.e(this.getClass().getName(), "Error Parsing XML", e);
-				e.printStackTrace();
+				Logger.e(this.getClass().getName(), "Error Parsing XML", e);
+				return null;
 			}
 			catch (SAXException e)
 			{
-				//this._logger.e(this.getClass().getName(), "Error Parsing XML", e);
+				Logger.e(this.getClass().getName(), "Error Parsing XML", e);
 				return null;
 			}
 			catch (IOException e)
 			{
-				//this._logger.e(this.getClass().getName(), "Error Parsing XML", e);
+				Logger.e(this.getClass().getName(), "Error Parsing XML", e);
 				return null;
 			}
 

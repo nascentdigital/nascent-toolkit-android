@@ -9,11 +9,17 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 import org.apache.http.util.ByteArrayBuffer;
+import com.nascentdigital.util.Logger;
 
 
 
 public final class ServiceOperation<TResponse, TResult> implements Runnable 
 {
+	// [region] constants
+	private static final int HTTP_OK_STATUS_CODE = 200;
+	private static final int RESPONSE_BUFFER_SIZE = 512;
+	// [endregion]
+	
 	// [region] instance variables
 	
 	public final ServiceOperationPriority priority;
@@ -23,10 +29,10 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 	public final Map<String, String> headers;
 	public final Map<String, String> queryParameters;
 	
-	private final IBodyDataProvider _bodyDataProvider;
+	private final BodyDataProvider _bodyDataProvider;
 	private final ServiceResponseFormat<TResponse> _responseFormat;
-	private final IResponseTransform<TResponse, TResult> _responseTransform;
-	private final IServiceClientCompletion<TResult> _completion;
+	private final ResponseTransform<TResponse, TResult> _responseTransform;
+	private final ServiceClientCompletion<TResult> _completion;
 	private final boolean _useCaches;
 	private final ServiceClient _serviceClient;
 	private final int _requestTimeoutInMilliseconds;
@@ -39,10 +45,10 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 		ServiceMethod method,
 		Map<String, String> headers, 
 		Map<String, String> queryParameters,
-		IBodyDataProvider bodyDataProvider,
+		BodyDataProvider bodyDataProvider,
 		ServiceResponseFormat<TResponse> responseFormat,
-		IResponseTransform<TResponse, TResult> responseTransform,
-		IServiceClientCompletion<TResult> completion,
+		ResponseTransform<TResponse, TResult> responseTransform,
+		ServiceClientCompletion<TResult> completion,
 		ServiceOperationPriority priority, 
 		boolean useCaches,
 		int requestTimeoutInMilliseconds,
@@ -103,7 +109,6 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 					connection.setRequestProperty(field, this.headers.get(field));
 				}				
 				
-				//TODO: Set timeout values
 				connection.setReadTimeout(_requestTimeoutInMilliseconds);
 				connection.setUseCaches (_useCaches);
 				connection.setDoInput(true);
@@ -139,17 +144,19 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 				
 				//Verify the responseCode before reading from the stream
 				responseCode = connection.getResponseCode();
-			    if (responseCode != 200)
+			    if (responseCode != HTTP_OK_STATUS_CODE)
 			    {
 			    	String statusMessage = connection.getResponseMessage();
 			    	throw new InvalidResponseCodeException(responseCode, statusMessage);
 			    }
-				
+			    
+			    //Check for cancellation
 			    throwIfInterrupted();
+			    
 			    BufferedInputStream bis = new BufferedInputStream(in);
 			    ByteArrayBuffer baf = new ByteArrayBuffer(50);
 			    int read = 0;
-			    int bufSize = 512;
+			    int bufSize = RESPONSE_BUFFER_SIZE;
 			    byte[] buffer = new byte[bufSize];
 			    while(true){
 			          read = bis.read(buffer);
@@ -199,6 +206,7 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 			}
 			catch (InterruptedException ie)
 			{
+				Logger.e(this.getClass().getName(), "Service Operation Task Cancelled.", ie);
 				if (_completion != null)
 				{
 					_completion.onCompletion(ServiceResultStatus.CANCELLED, responseCode, null);
@@ -207,7 +215,8 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 			}
 			catch (Exception ex)
 			{
-				//TODO: FIXME: handle error case better
+				Logger.e(this.getClass().getName(), "Error: Service Request Failed.", ex);
+				
 				_serviceClient.serviceOperationFailed(this, ex);
 				boolean retryRequired = _serviceClient.serviceOperationShouldRetry(this, responseCode, retryCount);
 				if (retryRequired)
@@ -225,7 +234,7 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 			}
 			finally
 			{
-				//close the connection
+				//close the connection if it hasn't been closed already
 				if (connection != null && isConnected)
 				{
 					connection.disconnect();
@@ -235,7 +244,7 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 		} while (requestInProgress);
 	}
 	
-	private static void throwIfInterrupted() throws InterruptedException
+	private static final void throwIfInterrupted() throws InterruptedException
 	{
 		if (Thread.currentThread().isInterrupted())
 		{
@@ -257,7 +266,7 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 				{
 					uriWithQueryParams += "&";
 				}
-				uriWithQueryParams += field + "=" + URLEncoder.encode(queryParameters.get(field), "UTF-8");
+				uriWithQueryParams += field + "=" + URLEncoder.encode(queryParameters.get(field), ServiceClientConstants.UTF8_ENCODING);
 				addAmperstand = true;
 			}
 		}

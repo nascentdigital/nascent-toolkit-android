@@ -1,6 +1,6 @@
 package com.nascentdigital.communication;
 
-public interface IBodyDataProvider {
+public interface BodyDataProvider {
 	
 	byte[] getBodyData ();
 

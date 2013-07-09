@@ -1,12 +1,13 @@
 package com.nascentdigital.communication;
 
-import java.nio.charset.Charset;
+import java.io.UnsupportedEncodingException;
+import com.nascentdigital.util.Logger;
 
 /**
  * Default string body data provider that converts string to bytes using UTF-8
  *
  */
-public class StringBodyDataProvider implements IBodyDataProvider
+public class StringBodyDataProvider implements BodyDataProvider
 {
 	// [region] instance variables
 	private String body;
@@ -27,7 +28,15 @@ public class StringBodyDataProvider implements IBodyDataProvider
 			return null;
 		}
 		//On android the default charset is UTF-8
-		return body.getBytes(Charset.defaultCharset());
+		try
+		{
+			return body.getBytes(ServiceClientConstants.UTF8_ENCODING);
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			Logger.e(this.getClass().getName(), "Encoding Exception Transforming Request", e);
+			return null;
+		}
 	}
 	// [endregion]
 	

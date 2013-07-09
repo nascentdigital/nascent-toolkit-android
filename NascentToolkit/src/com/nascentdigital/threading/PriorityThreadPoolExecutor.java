@@ -15,8 +15,10 @@ public class PriorityThreadPoolExecutor<TRunnable extends Runnable>
 	// [region] constructors
 
 	@SuppressWarnings("unchecked")
-	public PriorityThreadPoolExecutor(int corePoolSize, int maximumPoolSize,
-		long keepAliveTime, TimeUnit unit,
+	public PriorityThreadPoolExecutor(int corePoolSize, 
+		int maximumPoolSize,
+		long keepAliveTime, 
+		TimeUnit unit,
 		PriorityBlockingQueue<TRunnable> workQueue)
 	{
 		//Object workQueueHack = workQueue;

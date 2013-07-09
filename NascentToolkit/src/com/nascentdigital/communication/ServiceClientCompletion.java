@@ -1,6 +1,6 @@
 package com.nascentdigital.communication;
 
-public interface IServiceClientCompletion <T>
+public interface ServiceClientCompletion <T>
 {
 	void onCompletion (ServiceResultStatus serviceResultStatus, int responseCode, T resultValue);
 

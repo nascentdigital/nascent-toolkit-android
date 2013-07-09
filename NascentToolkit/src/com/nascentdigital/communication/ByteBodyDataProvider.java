@@ -1,6 +1,6 @@
 package com.nascentdigital.communication;
 
-public class ByteBodyDataProvider implements IBodyDataProvider {
+public class ByteBodyDataProvider implements BodyDataProvider {
 
 	private byte[] bodyData;
 	
