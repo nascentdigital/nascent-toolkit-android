@@ -1,6 +1,6 @@
 package com.nascentdigital.communication;
 
-public interface ResponseTransform <TResponse, TResult>
+public interface ServiceResponseTransform <TResponse, TResult>
 {
 	/**
 	 * 

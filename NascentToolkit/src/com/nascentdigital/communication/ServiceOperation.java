@@ -31,7 +31,7 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 	
 	private final BodyDataProvider _bodyDataProvider;
 	private final ServiceResponseFormat<TResponse> _responseFormat;
-	private final ResponseTransform<TResponse, TResult> _responseTransform;
+	private final ServiceResponseTransform<TResponse, TResult> _responseTransform;
 	private final ServiceClientCompletion<TResult> _completion;
 	private final boolean _useCaches;
 	private final ServiceClient _serviceClient;
@@ -47,7 +47,7 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 		Map<String, String> queryParameters,
 		BodyDataProvider bodyDataProvider,
 		ServiceResponseFormat<TResponse> responseFormat,
-		ResponseTransform<TResponse, TResult> responseTransform,
+		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion,
 		ServiceOperationPriority priority, 
 		boolean useCaches,

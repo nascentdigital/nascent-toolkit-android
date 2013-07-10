@@ -127,7 +127,7 @@ public class ServiceClient
 		String uri, ServiceMethod method, Map<String, String> headers,
 		Map<String, String> queryParameters, String body,
 		ServiceResponseFormat<TResponse> responseFormat,
-		ResponseTransform<TResponse, TResult> responseTransform,
+		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion)
 	{
 		return this.beginRequest(uri, method, headers, queryParameters, body,
@@ -139,7 +139,7 @@ public class ServiceClient
 		String uri, ServiceMethod method, Map<String, String> headers,
 		Map<String, String> queryParameters, String body,
 		ServiceResponseFormat<TResponse> responseFormat,
-		ResponseTransform<TResponse, TResult> responseTransform,
+		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion,
 		ServiceOperationPriority priority, boolean useCaches)
 
@@ -159,7 +159,7 @@ public class ServiceClient
 		String uri, ServiceMethod method, Map<String, String> headers,
 		Map<String, String> queryParameters, byte[] bodyData,
 		ServiceResponseFormat<TResponse> responseFormat,
-		ResponseTransform<TResponse, TResult> responseTransform,
+		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion)
 	{
 		return this.beginRequest(uri, method, headers, queryParameters,
@@ -171,7 +171,7 @@ public class ServiceClient
 		String uri, ServiceMethod method, Map<String, String> headers,
 		Map<String, String> queryParameters, byte[] bodyData,
 		ServiceResponseFormat<TResponse> responseFormat,
-		ResponseTransform<TResponse, TResult> responseTransform,
+		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion,
 		ServiceOperationPriority priority, boolean useCaches)
 
@@ -193,7 +193,7 @@ public class ServiceClient
 		Map<String, String> queryParameters,
 		BodyDataProvider bodyDataProvider,
 		ServiceResponseFormat<TResponse> responseFormat,
-		ResponseTransform<TResponse, TResult> responseTransform,
+		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion,
 		ServiceOperationPriority priority, boolean useCaches)
 	{
