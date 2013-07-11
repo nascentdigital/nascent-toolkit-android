@@ -21,14 +21,6 @@ public class GoogleMapsServiceClient extends ServiceClient
 	
 	// [endregion]
 
-	// [region] cctor
-	
-	public GoogleMapsServiceClient()
-	{
-		
-	}
-	
-	// [endregion]
 	
 	// [region] public methods
 	
@@ -56,15 +48,8 @@ public class GoogleMapsServiceClient extends ServiceClient
 				{
 					Long result = null;
 					try
-					{
-						if (json.get("rows") != null
-						        && json.getJSONArray("rows").length() > 0
-						        && json.getJSONArray("rows").getJSONObject(0).get("elements") != null
-						        && json.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").length() > 0
-						        && json.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).get("duration") != null )
-						    {
-								result = json.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject("duration").getLong("value");
-						    }
+					{					
+						result = json.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject("duration").getLong("value");					    
 					}
 					catch (JSONException e)
 					{

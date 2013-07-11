@@ -7,6 +7,8 @@ import java.util.Set;
 import android.app.Activity;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,7 +23,7 @@ import com.nascentdigital.util.Logger;
 import com.nascenttoolkitdemos.services.GoogleMapsServiceClient;
 
 
-public class MainActivity extends Activity
+public class MainActivity extends Activity implements OnClickListener
 {
 	// [region] static instance variables
 	private static final Map<String, Location> _cityToLocation;
@@ -29,8 +31,7 @@ public class MainActivity extends Activity
 	
 	// [region] instance variables
 	private Spinner _fromSpinner, _toSpinner;
-	private Button _submitButton;
-	private GoogleMapsServiceClient _serviceClient;
+ 	private GoogleMapsServiceClient _serviceClient;
 	private TextView _resultsTextView;
 	// [endregion]
 	
@@ -65,9 +66,9 @@ public class MainActivity extends Activity
 		
 		_fromSpinner.setAdapter(dataAdapter);
 		_toSpinner.setAdapter(dataAdapter);
-		
-		_submitButton = (Button) findViewById(R.id.submitButton);
-		setUpSubmitOnClickListener();
+
+		// wire events
+		findViewById(R.id.submitButton).setOnClickListener(this);
 	}
 
 
@@ -81,51 +82,55 @@ public class MainActivity extends Activity
 	// [endregion]
 	
 	// [region] private methods
-	private void setUpSubmitOnClickListener()
+	
+	@Override
+	public void onClick(View sender)
 	{
-		_submitButton.setOnClickListener(new OnClickListener () {
-
-		@Override
-		public void onClick(View arg0)
+		switch (sender.getId())
 		{
-			final String fromCity = String.valueOf(_fromSpinner.getSelectedItem());
-			final String toCity = String.valueOf(_toSpinner.getSelectedItem());
-			 
-			Location from = _cityToLocation.get(fromCity);
-			Location to = _cityToLocation.get(toCity);
-			
-			//Make network call
-			_serviceClient.getTimeToArrivalFromCoordinates(from, to, new ServiceClientCompletion<Long>() {
-
-				@Override
-				public void onCompletion(
-					final ServiceResultStatus serviceResultStatus,
-					final int responseCode, 
-					final Long distanceInSeconds)
-				{
-					//Ensure updates to UI elements happen on the UI thread.
-					MainActivity.this.runOnUiThread(new Runnable()
-					{
-					    public void run()
-					    {
-					    	if (distanceInSeconds != null && serviceResultStatus == ServiceResultStatus.SUCCESS)
-							{
-								String formattedTime = formatIntoHoursAndMinutes(distanceInSeconds);
-								
-								_resultsTextView.setText("It takes " + formattedTime + " to get from " + fromCity + " to " + toCity + ".");
-							}
-							else
-							{
-								_resultsTextView.setText("Could not calculate distance due to error. (" + responseCode + ")");
-							}
-					    }
-					});//end runOnUiThread
-					
-					
-				}});//end onCompletion
-			
-		}});//end onClick
+			case R.id.submitButton:
+				onSubmit();
+				break;
+		}
+		 
 	}
+	
+	private void onSubmit()
+	{
+		final String fromCity = String.valueOf(_fromSpinner.getSelectedItem());
+		final String toCity = String.valueOf(_toSpinner.getSelectedItem());
+		 
+		Location from = _cityToLocation.get(fromCity);
+		Location to = _cityToLocation.get(toCity);
+		
+		//Make network call
+		_serviceClient.getTimeToArrivalFromCoordinates(from, to, new ServiceClientCompletion<Long>() {
+
+			@Override
+			public void onCompletion(
+				final ServiceResultStatus serviceResultStatus,
+				final int responseCode, 
+				final Long distanceInSeconds)
+			{
+				
+				if (distanceInSeconds != null && serviceResultStatus == ServiceResultStatus.SUCCESS)
+				{
+					String formattedTime = formatIntoHoursAndMinutes(distanceInSeconds);
+					
+					_resultsTextView.setText("It takes " + formattedTime + " to get from " + fromCity + " to " + toCity + ".");
+				}
+				else
+				{
+					_resultsTextView.setText("Could not calculate distance due to error. (" + responseCode + ")");
+				}
+				
+				
+				
+				
+			}});//end onCompletion
+	}
+
+
 	
 	private static String formatIntoHoursAndMinutes(long secondsIn)
 	{
