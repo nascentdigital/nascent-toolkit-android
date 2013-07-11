@@ -1,3 +1,4 @@
+
 package com.nascentdigital.communication;
 
 
@@ -124,8 +125,11 @@ public class ServiceClient
 	// [region] public methods
 
 	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
-		String uri, ServiceMethod method, Map<String, String> headers,
-		Map<String, String> queryParameters, String body,
+		String uri, 
+		ServiceMethod method, 
+		Map<String, String> headers,
+		Map<String, String> queryParameters, 
+		String body,
 		ServiceResponseFormat<TResponse> responseFormat,
 		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion)
@@ -136,8 +140,10 @@ public class ServiceClient
 	}
 
 	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
-		String uri, ServiceMethod method, Map<String, String> headers,
-		Map<String, String> queryParameters, String body,
+		String uri, 
+		ServiceMethod method, Map<String, String> headers,
+		Map<String, String> queryParameters,
+		String body,
 		ServiceResponseFormat<TResponse> responseFormat,
 		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion,
@@ -156,8 +162,11 @@ public class ServiceClient
 	}
 
 	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
-		String uri, ServiceMethod method, Map<String, String> headers,
-		Map<String, String> queryParameters, byte[] bodyData,
+		String uri, 
+		ServiceMethod method, 
+		Map<String, String> headers,
+		Map<String, String> queryParameters, 
+		byte[] bodyData,
 		ServiceResponseFormat<TResponse> responseFormat,
 		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion)
@@ -168,12 +177,15 @@ public class ServiceClient
 	}
 
 	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
-		String uri, ServiceMethod method, Map<String, String> headers,
-		Map<String, String> queryParameters, byte[] bodyData,
+		String uri, 
+		ServiceMethod method, Map<String, String> headers,
+		Map<String, String> queryParameters, 
+		byte[] bodyData,
 		ServiceResponseFormat<TResponse> responseFormat,
 		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion,
-		ServiceOperationPriority priority, boolean useCaches)
+		ServiceOperationPriority priority, 
+		boolean useCaches)
 
 	{
 		ByteBodyDataProvider bodyDataProvider = null;
@@ -189,13 +201,16 @@ public class ServiceClient
 
 
 	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
-		String uri, ServiceMethod method, Map<String, String> headers,
+		String uri, 
+		ServiceMethod method, 
+		Map<String, String> headers,
 		Map<String, String> queryParameters,
 		BodyDataProvider bodyDataProvider,
 		ServiceResponseFormat<TResponse> responseFormat,
 		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion,
-		ServiceOperationPriority priority, boolean useCaches)
+		ServiceOperationPriority priority, 
+		boolean useCaches)
 	{
 
 		ServiceOperation<TResponse, TResult> serviceOperation =
