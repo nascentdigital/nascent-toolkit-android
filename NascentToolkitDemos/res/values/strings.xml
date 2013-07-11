@@ -3,6 +3,19 @@
 
     <string name="app_name">NascentToolkitDemos</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="submit">Find Driving Time</string>
+    <string name="departure_city_prompt">Choose departure city</string>
+    <string name="arrival_city_prompt">Choose arrival city</string>
+    
+    <string-array name="city_array">
+        <item>Toronto</item>
+        <item>New York City</item>
+        <item>Montreal</item>
+        <item>Mexico City</item>
+        <item>San Fransisco</item>
+        <item>Miami</item>
+        <item>Chicago</item>
+        <item>Vancover</item>
+    </string-array>
 
 </resources>

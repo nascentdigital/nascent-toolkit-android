@@ -34,6 +34,10 @@ public class GoogleMapsServiceClient extends ServiceClient
 	
 	public void getTimeToArrivalFromCoordinates (Location fromCoordinates, Location toCoordinates, ServiceClientCompletion<Long> completion)
 	{
+		//Headers
+		Map<String,String> headers = new HashMap<String,String>();
+		headers.put("Accept", "application/json");
+		
 		//Params
 		String origin = fromCoordinates.getLatitude() + "," + fromCoordinates.getLongitude();
 		String destination = toCoordinates.getLatitude() + "," + toCoordinates.getLongitude();
@@ -42,10 +46,7 @@ public class GoogleMapsServiceClient extends ServiceClient
 		params.put("origins", origin);
 		params.put("destinations", destination);
 		params.put("sensor", "false");
-		
-		//Headers
-		Map<String,String> headers = new HashMap<String,String>();
-		headers.put("Accept", "application/json");
+	
 		
 		//transform
 		ServiceResponseTransform<JSONObject,Long> responseTransform = new ServiceResponseTransform<JSONObject,Long> () 
@@ -62,7 +63,7 @@ public class GoogleMapsServiceClient extends ServiceClient
 						        && json.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").length() > 0
 						        && json.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).get("duration") != null )
 						    {
-								result = json.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getLong("duration");
+								result = json.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject("duration").getLong("value");
 						    }
 					}
 					catch (JSONException e)

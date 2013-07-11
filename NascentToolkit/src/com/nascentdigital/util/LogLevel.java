@@ -44,7 +44,7 @@ public enum LogLevel
 	 */
 	public boolean allows(LogLevel other)
 	{
-		return value >= other.value;
+		return value <= other.value;
 	}
 
 	// [endregion]
