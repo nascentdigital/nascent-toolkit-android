@@ -7,7 +7,7 @@ import org.aspectj.lang.reflect.FieldSignature;
 import com.nascentdigital.util.Logger;
 import com.nascentdigital.util.observing.Observable;
 import com.nascentdigital.util.observing.ObservableField;
-import com.nascentdigital.util.observing.UnobservedAction;
+import com.nascentdigital.util.observing.Unobserved;
 
 
 public privileged aspect ObservablePropertiesAspect
@@ -27,7 +27,8 @@ public privileged aspect ObservablePropertiesAspect
 		&& target(java.util.List);
 
 	pointcut executingUnobservedAction() :
-		withincode(* UnobservedAction+.execute());
+		within(@Unobserved *)
+		|| withincode(@Unobserved * *.*(..));
 
 	// [endregion]
 
