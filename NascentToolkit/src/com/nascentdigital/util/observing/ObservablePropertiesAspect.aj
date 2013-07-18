@@ -34,7 +34,7 @@ public privileged aspect ObservablePropertiesAspect
 
 
 	// [region] advice
-
+	
 	@SuppressAjWarnings
 	void around(Observable observable, Object newValue) 
 		: fieldSet(observable, newValue)
@@ -67,11 +67,10 @@ public privileged aspect ObservablePropertiesAspect
 
 		// determine field id
 		ObservableField annotation = field.getAnnotation(ObservableField.class);
-		int fieldId = annotation.id();
 
 		// raise event
 		String fieldName = field.getName();
-		observable.raiseObservableChanged(fieldId, fieldName, oldValue,
+		observable.raiseObservableChanged(annotation, fieldName, oldValue,
 			newValue);
 	}
 

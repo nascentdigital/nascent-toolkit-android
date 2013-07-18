@@ -21,8 +21,8 @@ public interface ObservableListener
 	 * 
 	 * @param sender
 	 *            the observable instance that changed.
-	 * @param fieldId
-	 *            the identifier for the field that changed.
+	 * @param field
+	 *            the field definition of the field that changed.
 	 * @param fieldName
 	 *            the field name.
 	 * @param oldValue
@@ -30,8 +30,8 @@ public interface ObservableListener
 	 * @param newValue
 	 *            the value after the field change (primitives are boxed).
 	 */
-	void onObservableChanged(Object sender, int fieldId, String fieldName,
-		Object oldValue, Object newValue);
+	void onObservableChanged(Object sender, ObservableField field,
+		String fieldName, Object oldValue, Object newValue);
 
 	// [endregion]
 

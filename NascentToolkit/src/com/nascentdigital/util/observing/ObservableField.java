@@ -19,7 +19,7 @@ public @interface ObservableField
 {
 	// [region] properties
 
-	public int id();
+	public int value();
 
 	// [endregion]
 

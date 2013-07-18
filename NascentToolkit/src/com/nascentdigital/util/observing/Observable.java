@@ -1,11 +1,12 @@
 package com.nascentdigital.util.observing;
 
 
+import com.nascentdigital.util.LogLevel;
 import com.nascentdigital.util.Logger;
 import com.nascentdigital.util.WeakList;
-
 import android.os.Handler;
 import android.os.Looper;
+import android.util.SparseArray;
 
 
 /**
@@ -27,7 +28,7 @@ public class Observable
 
 	// [region] instance variables
 
-	private WeakList<ObservableListener> _listeners;
+	private SparseArray<WeakList<ObservableListener>> _listenerGroups;
 
 	// [endregion]
 
@@ -53,21 +54,45 @@ public class Observable
 	// [region] public methods
 
 	/**
-	 * Adds a new listener to the list of observers.
+	 * Adds the specified listener to receive event callbacks whenever the
+	 * targeted fields are modified.
 	 * 
 	 * @param listener
-	 *            the listener to be notified of changes.
+	 *            the listener to register for callbacks
+	 * @param fieldIds
+	 *            the ids of the fields being observed by the specified
+	 *            listener/observer
 	 */
-	public final void addObservableListener(ObservableListener listener)
+	public final void addObservableListener(ObservableListener listener,
+		int... fieldIds)
 	{
-		// lazy-load list
-		if (_listeners == null)
+		if (fieldIds == null || fieldIds.length < 1)
 		{
-			_listeners = new WeakList<ObservableListener>(16);
+			throw new IllegalArgumentException(
+				"At least one field identifier must be specified.");
 		}
 
-		// add listener
-		_listeners.add(listener);
+		// lazy-load listener groups
+		if (_listenerGroups == null)
+		{
+			_listenerGroups = new SparseArray<WeakList<ObservableListener>>(8);
+		}
+
+		// lazy-load listeners
+		for (int fieldId : fieldIds)
+		{
+			// create list if required
+			WeakList<ObservableListener> listeners =
+				_listenerGroups.get(fieldId);
+			if (listeners == null)
+			{
+				listeners = new WeakList<ObservableListener>(4);
+				_listenerGroups.put(fieldId, listeners);
+			}
+
+			// add listener
+			listeners.add(listener);
+		}
 	}
 
 	/**
@@ -75,17 +100,44 @@ public class Observable
 	 * 
 	 * @param listener
 	 *            the listener to stop notifying of changes.
+	 * @param fieldIds
+	 *            a set of field ids to be unregistered for, or no parameters if
+	 *            all fields should be unregistered for the specified listener
 	 */
-	public final void removeObservableListener(ObservableListener listener)
+	public final void removeObservableListener(ObservableListener listener,
+		int... fieldIds)
 	{
-		// skip if no listeners
-		if (_listeners == null)
+		// skip if no listener groups exist
+		if (_listenerGroups == null)
 		{
 			return;
 		}
 
-		// remove listener
-		_listeners.remove(listener);
+		// remove from all fields
+		if (fieldIds == null)
+		{
+			int listenerGroupCount = _listenerGroups.size();
+			for (int i = 0; i < listenerGroupCount; ++i)
+			{
+				WeakList<ObservableListener> listeners =
+					_listenerGroups.valueAt(i);
+				listeners.remove(listener);
+			}
+		}
+
+		// or remove from specific fields specified
+		else
+		{
+			for (int fieldId : fieldIds)
+			{
+				WeakList<ObservableListener> listeners =
+					_listenerGroups.get(fieldId);
+				if (listeners != null)
+				{
+					listeners.remove(listener);
+				}
+			}
+		}
 	}
 
 	// [endregion]
@@ -93,7 +145,7 @@ public class Observable
 
 	// [region] helper methods
 
-	public final void raiseObservableChanged(final int fieldId,
+	public final void raiseObservableChanged(final ObservableField field,
 		final String fieldName, final Object oldValue, final Object newValue)
 	{
 		// post on main thread if on background thread
@@ -104,8 +156,7 @@ public class Observable
 			{
 				public void run()
 				{
-					raiseObservableChanged(fieldId, fieldName, oldValue,
-						newValue);
+					raiseObservableChanged(field, fieldName, oldValue, newValue);
 				}
 			});
 
@@ -113,13 +164,28 @@ public class Observable
 			return;
 		}
 
-		Logger.v("Observable", "updated " + fieldName + ": " + newValue);
+		if (Logger.level.allows(LogLevel.VERBOSE))
+		{
+			Logger.v(
+				"Observable",
+				getClass().getSimpleName() + "@"
+					+ System.identityHashCode(this) + " updated " + fieldName
+					+ ": " + newValue);
+		}
 
 		// notify self
-		onObservableChanged(fieldId, fieldName, oldValue, newValue);
+		onObservableChanged(field, fieldName, oldValue, newValue);
+
+		// skip if no groups are defined
+		if (_listenerGroups == null)
+		{
+			return;
+		}
 
 		// skip if no listeners
-		final WeakList<ObservableListener> listeners = _listeners;
+		final int fieldId = field.value();
+		final WeakList<ObservableListener> listeners =
+			_listenerGroups.get(fieldId);
 		if (listeners == null)
 		{
 			return;
@@ -128,12 +194,12 @@ public class Observable
 		// notify listeners
 		for (ObservableListener listener : listeners)
 		{
-			listener.onObservableChanged(this, fieldId, fieldName, oldValue,
+			listener.onObservableChanged(this, field, fieldName, oldValue,
 				newValue);
 		}
 	}
 
-	protected void onObservableChanged(int fieldId, String fieldName,
+	protected void onObservableChanged(ObservableField field, String fieldName,
 		Object oldValue, Object newValue)
 	{
 	}
