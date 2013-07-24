@@ -219,6 +219,14 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 				
 				requestInProgress = false;
 			}
+			catch (ServiceResponseTransformException te)
+			{
+				Logger.e(getClass().getName(),
+					"Error transforming response data.", te);
+				raiseCompletion(ServiceResultStatus.FAILED, responseCode, null);
+				
+				requestInProgress = false;
+			}
 			catch (Exception ex)
 			{
 				Logger.e(getClass().getName(),
