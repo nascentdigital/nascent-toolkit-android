@@ -102,7 +102,7 @@ public class ServiceClient
 	public ServiceClient(int maxConcurrentCount,
 		int requestTimeoutInMilliseconds)
 	{
-		this(maxConcurrentCount, ServiceClientConstants.MAX_POOL_SIZE,
+		this(maxConcurrentCount, maxConcurrentCount,
 			ServiceClientConstants.POOL_KEEP_ALIVE_SECONDS,
 			requestTimeoutInMilliseconds);
 	}
