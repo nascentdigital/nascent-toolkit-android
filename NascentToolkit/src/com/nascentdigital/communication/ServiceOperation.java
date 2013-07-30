@@ -105,10 +105,13 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 				connection.setRequestMethod(method.name());
 
 				// Set headers
-				for (String field : this.headers.keySet())
+				if (this.headers != null)
 				{
-					connection.setRequestProperty(field,
-						this.headers.get(field));
+					for (String field : this.headers.keySet())
+					{
+						connection.setRequestProperty(field,
+							this.headers.get(field));
+					}
 				}
 
 				connection.setReadTimeout(_requestTimeoutInMilliseconds);
