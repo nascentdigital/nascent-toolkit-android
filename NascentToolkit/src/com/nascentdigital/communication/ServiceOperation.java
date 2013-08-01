@@ -8,11 +8,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.Map;
 import org.apache.http.util.ByteArrayBuffer;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.SystemClock;
 import com.nascentdigital.util.Logger;
 
 
@@ -55,7 +55,7 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 		int requestTimeoutInMilliseconds, ServiceClient serviceClient)
 	{
 		this.priority = priority;
-		this.timestamp = SystemClock.elapsedRealtimeNanos();
+		this.timestamp = (new Date().getTime());
 		this.uri = uri;
 		this.method = method;
 		this.headers = headers;
