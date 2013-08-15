@@ -3,6 +3,7 @@ package com.nascentdigital.communication;
 
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -137,6 +138,9 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 					wr.write(bodyData);
 					wr.flush();
 					wr.close();
+					
+					// Verify the responseCode after sending output
+					responseCode = verifyResponseCode(connection);
 				}
 				else
 				{
@@ -149,39 +153,16 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 				// Get response
 				InputStream in = connection.getInputStream();
 
-				// Verify the responseCode before reading from the stream
-				responseCode = connection.getResponseCode();
-				if (responseCode != HTTP_OK_STATUS_CODE)
+				// Verify the responseCode before reading from the stream (only if not read after output)
+				if (responseCode == -1)
 				{
-					String statusMessage = connection.getResponseMessage();
-					throw new InvalidResponseCodeException(responseCode,
-						statusMessage);
+					responseCode = verifyResponseCode(connection);
 				}
 
 				// Check for cancellation
 				throwIfInterrupted();
 
-				BufferedInputStream bis = new BufferedInputStream(in);
-				ByteArrayBuffer baf = new ByteArrayBuffer(RESPONSE_BUFFER_SIZE);
-				int read = 0;
-				byte[] buffer = new byte[RESPONSE_BUFFER_SIZE];
-				while (true)
-				{
-					throwIfInterrupted();
-					read = bis.read(buffer);
-					if (read == -1)
-					{
-						break;
-					}
-					baf.append(buffer, 0, read);
-				}
-				buffer = null;
-
-				byte[] responseBody = baf.toByteArray();
-
-				// Disconnect to release resources
-				bis.close();
-				baf.clear();
+				byte[] responseBody = readFromStream(in);
 				connection.disconnect();
 				connection = null;
 				_serviceClient.serviceOperationDidEnd(this);
@@ -260,6 +241,59 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 			}
 
 		} while (requestInProgress);
+	}
+
+	private byte[] readFromStream(InputStream in) throws InterruptedException,
+		IOException
+	{
+		BufferedInputStream bis = new BufferedInputStream(in);
+		ByteArrayBuffer baf = new ByteArrayBuffer(RESPONSE_BUFFER_SIZE);
+		int read = 0;
+		byte[] buffer = new byte[RESPONSE_BUFFER_SIZE];
+		while (true)
+		{
+			throwIfInterrupted();
+			read = bis.read(buffer);
+			if (read == -1)
+			{
+				break;
+			}
+			baf.append(buffer, 0, read);
+		}
+		buffer = null;
+
+		byte[] responseBody = baf.toByteArray();
+
+		// Disconnect to release resources
+		bis.close();
+		baf.clear();
+		return responseBody;
+	}
+
+	private int verifyResponseCode(HttpURLConnection connection)
+		throws IOException, InvalidResponseCodeException
+	{
+		int responseCode;
+		responseCode = connection.getResponseCode();
+		if (responseCode != HTTP_OK_STATUS_CODE)
+		{
+			String statusMessage = connection.getResponseMessage();
+			String errorMessage = "";
+			try
+			{
+				//try to read the error stream.
+				InputStream in = connection.getErrorStream();
+				byte[] errorBody = readFromStream(in);
+				errorMessage = new String(errorBody, ServiceClientConstants.UTF8_ENCODING);
+			}
+			catch (Exception ex)
+			{
+				Logger.e(this.getClass().getName(), "No Error Body in Response", ex);
+			}
+			
+			throw new InvalidResponseCodeException(responseCode, statusMessage, errorMessage);
+		}
+		return responseCode;
 	}
 	
 	// [endregion]
