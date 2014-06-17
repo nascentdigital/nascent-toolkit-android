@@ -7,12 +7,12 @@ import android.util.Log;
 public final class Logger
 {
 	// [region] class variables
-	
-	public static volatile LogLevel level;
-	
+
+	public static volatile LogLevel level = LogLevel.INFO;
+
 	// [endregion]
-	
-	
+
+
 	// [region] constructors
 
 	private Logger()
@@ -26,7 +26,8 @@ public final class Logger
 
 	public static final void v(String context, String message)
 	{
-		if (level!= null && level.allows(LogLevel.VERBOSE))
+		if (level != null
+			&& level.allows(LogLevel.VERBOSE))
 		{
 			Log.v(context, message);
 		}
@@ -34,7 +35,8 @@ public final class Logger
 
 	public static final void d(String context, String message)
 	{
-		if (level!= null && level.allows(LogLevel.DEBUG))
+		if (level != null
+			&& level.allows(LogLevel.DEBUG))
 		{
 			Log.d(context, message);
 		}
@@ -42,7 +44,8 @@ public final class Logger
 
 	public static final void i(String context, String message)
 	{
-		if (level!= null && level.allows(LogLevel.INFO))
+		if (level != null
+			&& level.allows(LogLevel.INFO))
 		{
 			Log.i(context, message);
 		}
@@ -50,7 +53,8 @@ public final class Logger
 
 	public static final void w(String context, String message)
 	{
-		if (level!= null && level.allows(LogLevel.WARN))
+		if (level != null
+			&& level.allows(LogLevel.WARN))
 		{
 			Log.w(context, message);
 		}
@@ -58,7 +62,8 @@ public final class Logger
 
 	public static final void e(String context, String message)
 	{
-		if (level!= null && level.allows(LogLevel.ERROR))
+		if (level != null
+			&& level.allows(LogLevel.ERROR))
 		{
 			Log.e(context, message);
 		}
@@ -66,7 +71,8 @@ public final class Logger
 
 	public static final void e(String context, String message, Exception e)
 	{
-		if (level!= null && level.allows(LogLevel.ERROR))
+		if (level != null
+			&& level.allows(LogLevel.ERROR))
 		{
 			Log.e(context, message, e);
 		}
