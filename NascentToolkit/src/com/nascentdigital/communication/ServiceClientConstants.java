@@ -14,10 +14,11 @@ public class ServiceClientConstants {
 	public static final int SERVICE_RESPONSE_STATUS_CODE_BAD_DATA = -200;
 	public static final int SERVICE_RESPONSE_STATUS_CODE_ARCHIVED = -100;
 	public static final int SERVICE_RESPONSE_STATUS_CODE_UNKNOWN = -1;
-	public static final int SSERVICE_RESPONSE_STATUS_CODE_NONE = 0;
+	public static final int SERVICE_RESPONSE_STATUS_CODE_NONE = 0;
 	public static final int SERVICE_RESPONSE_STATUS_CODE_SUCCESS = 200;
-	public static final int SSERVICE_RESPONSE_STATUS_CODE_BAD_PARAMETERS = 400;
+	public static final int SERVICE_RESPONSE_STATUS_CODE_BAD_PARAMETERS = 400;
 	public static final int SERVICE_RESPONSE_STATUS_CODE_UNAUTHORIZED = 401;
+	public static final int SERVICE_RESPONSE_STATUS_CODE_NOT_FOUND = 404;
 	public static final int SERVICE_RESPONSE_STATUS_CODE_INTERNAL_SERVER_ERROR = 500;
 	public static final int SERVICE_RESPONSE_STATUS_CODE_SERVER_ERROR = 501;
 	// [endregion]
