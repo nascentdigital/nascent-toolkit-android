@@ -1,8 +1,8 @@
 package com.nascentdigital.communication;
 
-
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -11,16 +11,16 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Map;
+import javax.net.ssl.HttpsURLConnection;
 import org.apache.http.util.ByteArrayBuffer;
 import android.os.Handler;
 import android.os.Looper;
 import com.nascentdigital.util.Logger;
 
-
-public final class ServiceOperation<TResponse, TResult> implements Runnable
-{
+public final class ServiceOperation<TResponse, TResult> implements Runnable {
 	// [region] constants
 	private static final int HTTP_OK_STATUS_CODE = 200;
+	private static final int HTTP_MULTIPLE_CHOICES_CODE = 300;
 	private static final int RESPONSE_BUFFER_SIZE = 512;
 	// [endregion]
 
@@ -47,14 +47,13 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 	// [region] constructors
 
 	public ServiceOperation(String uri, ServiceMethod method,
-		Map<String, String> headers, Map<String, String> queryParameters,
-		BodyDataProvider bodyDataProvider,
-		ServiceResponseFormat<TResponse> responseFormat,
-		ServiceResponseTransform<TResponse, TResult> responseTransform,
-		ServiceClientCompletion<TResult> completion,
-		ServiceOperationPriority priority, boolean useCaches,
-		int requestTimeoutInMilliseconds, ServiceClient serviceClient)
-	{
+			Map<String, String> headers, Map<String, String> queryParameters,
+			BodyDataProvider bodyDataProvider,
+			ServiceResponseFormat<TResponse> responseFormat,
+			ServiceResponseTransform<TResponse, TResult> responseTransform,
+			ServiceClientCompletion<TResult> completion,
+			ServiceOperationPriority priority, boolean useCaches,
+			int requestTimeoutInMilliseconds, ServiceClient serviceClient) {
 		this.priority = priority;
 		this.timestamp = (new Date().getTime());
 		this.uri = uri;
@@ -75,75 +74,65 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 
 	// [region] public methods
 
-
 	@Override
-	public void run()
-	{
+	public void run() {
 		_currentThread = Thread.currentThread();
 		boolean requestInProgress = true;
 		int retryCount = 0;
-		do
-		{
+		do {
 			boolean isConnected = false;
 			HttpURLConnection connection = null;
 			int responseCode = -1;
-			try
-			{
+			try {
 				// Check for cancellation
 				throwIfInterrupted();
 
 				// Add query string params to uri
-				String uriWithQueryParams =
-					addQueryStringParametersToUri(this.uri,
-						this.queryParameters);
+				String uriWithQueryParams = addQueryStringParametersToUri(
+						this.uri, this.queryParameters);
 
 				URL url = new URL(uriWithQueryParams);
 
 				// Create and open request/connection
 				_serviceClient.serviceOperationDidBegin(this);
 
-				connection = (HttpURLConnection)url.openConnection();
+				connection = (HttpURLConnection) url.openConnection();
 				connection.setRequestMethod(method.name());
 
 				// Set headers
-				if (this.headers != null)
-				{
-					for (String field : this.headers.keySet())
-					{
+				if (this.headers != null) {
+					for (String field : this.headers.keySet()) {
 						connection.setRequestProperty(field,
-							this.headers.get(field));
+								this.headers.get(field));
 					}
 				}
 
 				connection.setReadTimeout(_requestTimeoutInMilliseconds);
+				connection.setConnectTimeout(_requestTimeoutInMilliseconds);
 				connection.setUseCaches(_useCaches);
 				connection.setDoInput(true);
 
 				// create and send body data to request
-				byte[] bodyData =
-					_bodyDataProvider == null ? null : _bodyDataProvider
-						.getBodyData();
+				byte[] bodyData = _bodyDataProvider == null ? null
+						: _bodyDataProvider.getBodyData();
 
 				// check for cancellation
 				throwIfInterrupted();
 
-				if (bodyData != null)
-				{
+				if (bodyData != null) {
 					connection.setRequestProperty("Content-Length", ""
-						+ bodyData.length);
+							+ bodyData.length);
 					connection.setDoOutput(true);
 
-					DataOutputStream wr =
-						new DataOutputStream(connection.getOutputStream());
+					DataOutputStream wr = new DataOutputStream(
+							connection.getOutputStream());
 					wr.write(bodyData);
 					wr.flush();
 					wr.close();
-					
+
 					// Verify the responseCode after sending output
 					responseCode = verifyResponseCode(connection);
-				}
-				else
-				{
+				} else {
 					connection.setDoOutput(false);
 				}
 
@@ -153,9 +142,9 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 				// Get response
 				InputStream in = connection.getInputStream();
 
-				// Verify the responseCode before reading from the stream (only if not read after output)
-				if (responseCode == -1)
-				{
+				// Verify the responseCode before reading from the stream (only
+				// if not read after output)
+				if (responseCode == -1) {
 					responseCode = verifyResponseCode(connection);
 				}
 
@@ -171,71 +160,82 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 				throwIfInterrupted();
 
 				// process response
-				TResponse data =
-					_serviceClient.transformDataIntoResponseFormat(this,
-						responseBody, _responseFormat);
+				TResponse data = _serviceClient
+						.transformDataIntoResponseFormat(this, responseBody,
+								_responseFormat);
 
 				TResult result = null;
-				if (_responseTransform != null)
-				{
+				if (_responseTransform != null) {
 					result = _responseTransform.transformResponseData(data);
-				}
-				else
+				} else
 				// since there is no transform, set data to be the result
 				{
 					@SuppressWarnings("unchecked")
-					TResult resultTemp = (TResult)data;
+					TResult resultTemp = (TResult) data;
 					result = resultTemp;
 				}
 
 				// Check for cancellation
 				throwIfInterrupted();
 
-				raiseCompletion(ServiceResultStatus.SUCCESS, responseCode, result);
+				raiseCompletion(ServiceResultStatus.SUCCESS, responseCode,
+						result);
 
 				requestInProgress = false;
-			}
-			catch (InterruptedException ie)
-			{
+			} catch (InterruptedException ie) {
 				Logger.e(getClass().getName(),
-					"Service Operation Task Cancelled.", ie);
-				raiseCompletion(ServiceResultStatus.CANCELLED, responseCode, null);
-				
+						"Service Operation Task Cancelled.", ie);
+				raiseCompletion(ServiceResultStatus.CANCELLED, responseCode,
+						null);
+
 				requestInProgress = false;
-			}
-			catch (ServiceResponseTransformException te)
-			{
+			} catch (FileNotFoundException fnfe) {
+				Logger.e(getClass().getName(), "File not found.", fnfe);
+				raiseCompletion(ServiceResultStatus.FAILED, ServiceClientConstants.SERVICE_RESPONSE_STATUS_CODE_NOT_FOUND, null);
+				requestInProgress = false;
+			} catch (ServiceResponseTransformException te) {
 				Logger.e(getClass().getName(),
-					"Error transforming response data.", te);
+						"Error transforming response data.", te);
 				raiseCompletion(ServiceResultStatus.FAILED, responseCode, null);
-				
-				requestInProgress = false;
-			}
-			catch (Exception ex)
-			{
-				Logger.e(getClass().getName(),
-					"Error: Service Request Failed.", ex);
 
-				_serviceClient.serviceOperationFailed(this, ex);
-				boolean retryRequired =
-					_serviceClient.serviceOperationShouldRetry(this,
-						responseCode, retryCount);
-				if (retryRequired)
-				{
+				requestInProgress = false;
+			} catch (InvalidResponseCodeException ire) {
+				responseCode = ire.responseCode;
+				Logger.e(getClass().getName(),
+						"Error: Service Request Failed.", ire);
+
+				_serviceClient.serviceOperationFailed(this, ire);
+				boolean retryRequired = _serviceClient
+						.serviceOperationShouldRetry(this, responseCode,
+								retryCount);
+				if (retryRequired) {
 					++retryCount;
-				}
-				else
-				{
-					raiseCompletion(ServiceResultStatus.FAILED, responseCode, null);
-					
+				} else {
+					raiseCompletion(ServiceResultStatus.FAILED, responseCode,
+							null);
+
 					requestInProgress = false;
 				}
-			}
-			finally
-			{
+			} 
+			catch (Exception ex) {
+				Logger.e(getClass().getName(),
+						"Error: Service Request Failed.", ex);
+
+				_serviceClient.serviceOperationFailed(this, ex);
+				boolean retryRequired = _serviceClient
+						.serviceOperationShouldRetry(this, responseCode,
+								retryCount);
+				if (retryRequired) {
+					++retryCount;
+				} else {
+					raiseCompletion(ServiceResultStatus.FAILED, responseCode,
+							null);
+
+					requestInProgress = false;
+				}
+			} finally {
 				// close the connection if it hasn't been closed already
-				if (connection != null && isConnected)
-				{
+				if (connection != null && isConnected) {
 					connection.disconnect();
 				}
 			}
@@ -244,18 +244,15 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 	}
 
 	private byte[] readFromStream(InputStream in) throws InterruptedException,
-		IOException
-	{
+			IOException {
 		BufferedInputStream bis = new BufferedInputStream(in);
 		ByteArrayBuffer baf = new ByteArrayBuffer(RESPONSE_BUFFER_SIZE);
 		int read = 0;
 		byte[] buffer = new byte[RESPONSE_BUFFER_SIZE];
-		while (true)
-		{
+		while (true) {
 			throwIfInterrupted();
 			read = bis.read(buffer);
-			if (read == -1)
-			{
+			if (read == -1) {
 				break;
 			}
 			baf.append(buffer, 0, read);
@@ -271,101 +268,95 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable
 	}
 
 	private int verifyResponseCode(HttpURLConnection connection)
-		throws IOException, InvalidResponseCodeException
-	{
+			throws IOException, InvalidResponseCodeException {
 		int responseCode;
-		responseCode = connection.getResponseCode();
-		if (responseCode != HTTP_OK_STATUS_CODE)
-		{
+		try {
+			responseCode = connection.getResponseCode();
+		} catch (IOException e) {
+			// Older Android versions have trouble handling 401 errors.
+			if (e.getMessage().contains("authentication challenge")) { 				
+				return HttpsURLConnection.HTTP_UNAUTHORIZED;
+			} else {
+				throw e;
+			}
+		}
+		if (responseCode < HTTP_OK_STATUS_CODE
+				|| responseCode >= HTTP_MULTIPLE_CHOICES_CODE) {
 			String statusMessage = connection.getResponseMessage();
 			String errorMessage = "";
-			try
-			{
-				//try to read the error stream.
+			try {
+				// try to read the error stream.
 				InputStream in = connection.getErrorStream();
 				byte[] errorBody = readFromStream(in);
-				errorMessage = new String(errorBody, ServiceClientConstants.UTF8_ENCODING);
+				errorMessage = new String(errorBody,
+						ServiceClientConstants.UTF8_ENCODING);
+			} catch (Exception ex) {
+				Logger.e(this.getClass().getName(),
+						"No Error Body in Response", ex);
 			}
-			catch (Exception ex)
-			{
-				Logger.e(this.getClass().getName(), "No Error Body in Response", ex);
-			}
-			
-			throw new InvalidResponseCodeException(responseCode, statusMessage, errorMessage);
+
+			throw new InvalidResponseCodeException(responseCode, statusMessage,
+					errorMessage);
 		}
 		return responseCode;
 	}
-	
+
 	// [endregion]
-	
+
 	// [region] protected methods
-	
-	protected void cancel ()
-	{
-		if (_currentThread != null)
-		{
+
+	protected void cancel() {
+		if (_currentThread != null) {
 			_currentThread.interrupt();
 		}
 	}
-	
+
 	// [endregion]
-	
+
 	// [region] private methods
 
-	private void raiseCompletion(final ServiceResultStatus resultStatus, final int responseCode, final TResult result)
-	{
+	private void raiseCompletion(final ServiceResultStatus resultStatus,
+			final int responseCode, final TResult result) {
 		// raise completion
-		if (_completion != null)
-		{
+		if (_completion != null) {
 			Handler handler = new Handler(Looper.getMainLooper());
-			handler.post(new Runnable()
-			{
-			    public void run()
-			    {
-					_completion.onCompletion(resultStatus, responseCode, result);
-			    }
-			});//end runOnUiThread
+			handler.post(new Runnable() {
+				public void run() {
+					_completion
+							.onCompletion(resultStatus, responseCode, result);
+				}
+			});// end runOnUiThread
 
 		}
 	}
 
-	private void throwIfInterrupted() throws InterruptedException
-	{
-		if (_currentThread.isInterrupted())
-		{
+	private void throwIfInterrupted() throws InterruptedException {
+		if (_currentThread.isInterrupted()) {
 			throw new InterruptedException();
 		}
 	}
 
 	private static String addQueryStringParametersToUri(String uri,
-		Map<String, String> queryParameters)
-		throws UnsupportedEncodingException
-	{
+			Map<String, String> queryParameters)
+			throws UnsupportedEncodingException {
 		String uriWithQueryParams = uri;
-		if (queryParameters != null && !queryParameters.isEmpty())
-		{
+		if (queryParameters != null && !queryParameters.isEmpty()) {
 			uriWithQueryParams += "?";
 			boolean addAmperstand = false;
-			for (String field : queryParameters.keySet())
-			{
-				if (addAmperstand)
-				{
+			for (String field : queryParameters.keySet()) {
+				if (addAmperstand) {
 					uriWithQueryParams += "&";
 				}
-				uriWithQueryParams +=
-					field
+				uriWithQueryParams += field
 						+ "="
 						+ URLEncoder.encode(queryParameters.get(field),
-							ServiceClientConstants.UTF8_ENCODING);
+								ServiceClientConstants.UTF8_ENCODING);
 				addAmperstand = true;
 			}
 		}
 		return uriWithQueryParams;
 	}
 
-
 	// [endregion]
-	
-
 
 }
