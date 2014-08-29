@@ -156,21 +156,22 @@ public class ObservableArrayList<T> extends ArrayList<T>
 			return;
 		}
 
-		// notify listeners
-		raiseCollectionChanged(CollectionChange.REMOVE, 0, length);
-
 		// clear list
 		super.clear();
+		
+		// notify listeners
+		raiseCollectionChanged(CollectionChange.REMOVE, 0, length);
 	}
 
 	@Override
 	public T remove(int index)
 	{
-		// notify listeners
-		raiseCollectionChanged(CollectionChange.REMOVE, index, 1);
 
 		// call base implementation
 		T object = super.remove(index);
+		
+		// notify listeners
+		raiseCollectionChanged(CollectionChange.REMOVE, index, 1);
 
 		// return value
 		return object;
@@ -194,11 +195,11 @@ public class ObservableArrayList<T> extends ArrayList<T>
 	@Override
 	protected void removeRange(int start, int end)
 	{
-		// notify listeners
-		raiseCollectionChanged(CollectionChange.REMOVE, start, end - start);
-
 		// call base implementation
 		super.removeRange(start, end);
+		
+		// notify listeners
+		raiseCollectionChanged(CollectionChange.REMOVE, start, end - start);
 	}
 
 	@Override
