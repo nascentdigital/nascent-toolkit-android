@@ -28,7 +28,7 @@ public class Observable
 
 	// [region] instance variables
 
-	private SparseArray<WeakList<ObservableListener>> _listenerGroups;
+	private transient SparseArray<WeakList<ObservableListener>> _listenerGroups;
 
 	// [endregion]
 

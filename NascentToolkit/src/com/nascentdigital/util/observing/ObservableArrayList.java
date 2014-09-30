@@ -17,7 +17,7 @@ public class ObservableArrayList<T> extends ArrayList<T>
 
 	// [region] instance variables
 
-	private WeakList<ObservableListListener<T>> _listeners;
+	private transient WeakList<ObservableListListener<T>> _listeners;
 
 	// [endregion]
 
