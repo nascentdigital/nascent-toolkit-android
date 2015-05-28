@@ -22,6 +22,10 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 	private static final int HTTP_OK_STATUS_CODE = 200;
 	private static final int HTTP_MULTIPLE_CHOICES_CODE = 300;
 	private static final int RESPONSE_BUFFER_SIZE = 512;
+
+	public static final String twoHyphens = "--";
+	public static final String boundary =  "__com.nascentdigital.communication__";
+	public static final String lineEnd = "\r\n";
 	// [endregion]
 
 	// [region] instance variables
@@ -42,18 +46,20 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 	private final int _requestTimeoutInMilliseconds;
 	private Thread _currentThread;
 
+	private boolean _multiPart;
+
 	// [endregion]
 
 	// [region] constructors
 
 	public ServiceOperation(String uri, ServiceMethod method,
-			Map<String, String> headers, Map<String, String> queryParameters,
-			BodyDataProvider bodyDataProvider,
-			ServiceResponseFormat<TResponse> responseFormat,
-			ServiceResponseTransform<TResponse, TResult> responseTransform,
-			ServiceClientCompletion<TResult> completion,
-			ServiceOperationPriority priority, boolean useCaches,
-			int requestTimeoutInMilliseconds, ServiceClient serviceClient) {
+		Map<String, String> headers, Map<String, String> queryParameters,
+		BodyDataProvider bodyDataProvider,
+		ServiceResponseFormat<TResponse> responseFormat,
+		ServiceResponseTransform<TResponse, TResult> responseTransform,
+		ServiceClientCompletion<TResult> completion,
+		ServiceOperationPriority priority, boolean useCaches,
+		int requestTimeoutInMilliseconds, ServiceClient serviceClient) {
 		this.priority = priority;
 		this.timestamp = (new Date().getTime());
 		this.uri = uri;
@@ -68,6 +74,31 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 		_useCaches = useCaches;
 		_serviceClient = serviceClient;
 		_requestTimeoutInMilliseconds = requestTimeoutInMilliseconds;
+	}
+
+	public ServiceOperation(String uri, ServiceMethod method,
+		Map<String, String> headers, Map<String, String> queryParameters,
+		BodyDataProvider bodyDataProvider,
+		ServiceResponseFormat<TResponse> responseFormat,
+		ServiceResponseTransform<TResponse, TResult> responseTransform,
+		ServiceClientCompletion<TResult> completion,
+		ServiceOperationPriority priority, boolean useCaches,
+		int requestTimeoutInMilliseconds, ServiceClient serviceClient, boolean multiPart) {
+		this.priority = priority;
+		this.timestamp = (new Date().getTime());
+		this.uri = uri;
+		this.method = method;
+		this.headers = headers;
+		this.queryParameters = queryParameters;
+
+		_bodyDataProvider = bodyDataProvider;
+		_responseFormat = responseFormat;
+		_responseTransform = responseTransform;
+		_completion = completion;
+		_useCaches = useCaches;
+		_serviceClient = serviceClient;
+		_requestTimeoutInMilliseconds = requestTimeoutInMilliseconds;
+		_multiPart = multiPart;
 	}
 
 	// [endregion]
@@ -89,7 +120,7 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 
 				// Add query string params to uri
 				String uriWithQueryParams = addQueryStringParametersToUri(
-						this.uri, this.queryParameters);
+					this.uri, this.queryParameters);
 
 				URL url = new URL(uriWithQueryParams);
 
@@ -103,7 +134,7 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 				if (this.headers != null) {
 					for (String field : this.headers.keySet()) {
 						connection.setRequestProperty(field,
-								this.headers.get(field));
+							this.headers.get(field));
 					}
 				}
 
@@ -114,18 +145,26 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 
 				// create and send body data to request
 				byte[] bodyData = _bodyDataProvider == null ? null
-						: _bodyDataProvider.getBodyData();
+					: _bodyDataProvider.getBodyData();
 
 				// check for cancellation
 				throwIfInterrupted();
 
 				if (bodyData != null) {
 					connection.setRequestProperty("Content-Length", ""
-							+ bodyData.length);
+						+ bodyData.length);
+
+					if(_multiPart) {
+						connection.setRequestProperty("Accept-Encoding", "gzip, deflate");
+						connection.setRequestProperty("Accept", "*/*");
+						connection.setRequestProperty("Accept-Language", "en-us");
+						connection.setRequestProperty("Connection", "keep-alive");
+						connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+					}
 					connection.setDoOutput(true);
 
 					DataOutputStream wr = new DataOutputStream(
-							connection.getOutputStream());
+						connection.getOutputStream());
 					wr.write(bodyData);
 					wr.flush();
 					wr.close();
@@ -161,14 +200,14 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 
 				// process response
 				TResponse data = _serviceClient
-						.transformDataIntoResponseFormat(this, responseBody,
-								_responseFormat);
+					.transformDataIntoResponseFormat(this, responseBody,
+						_responseFormat);
 
 				TResult result = null;
 				if (_responseTransform != null) {
 					result = _responseTransform.transformResponseData(data);
 				} else
-				// since there is no transform, set data to be the result
+					// since there is no transform, set data to be the result
 				{
 					@SuppressWarnings("unchecked")
 					TResult resultTemp = (TResult) data;
@@ -179,14 +218,14 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 				throwIfInterrupted();
 
 				raiseCompletion(ServiceResultStatus.SUCCESS, responseCode,
-						result);
+					result);
 
 				requestInProgress = false;
 			} catch (InterruptedException ie) {
 				Logger.e(getClass().getName(),
-						"Service Operation Task Cancelled.", ie);
+					"Service Operation Task Cancelled.", ie);
 				raiseCompletion(ServiceResultStatus.CANCELLED, responseCode,
-						null);
+					null);
 
 				requestInProgress = false;
 			} catch (FileNotFoundException fnfe) {
@@ -195,41 +234,41 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 				requestInProgress = false;
 			} catch (ServiceResponseTransformException te) {
 				Logger.e(getClass().getName(),
-						"Error transforming response data.", te);
+					"Error transforming response data.", te);
 				raiseCompletion(ServiceResultStatus.FAILED, responseCode, null);
 
 				requestInProgress = false;
 			} catch (InvalidResponseCodeException ire) {
 				responseCode = ire.responseCode;
 				Logger.e(getClass().getName(),
-						"Error: Service Request Failed.", ire);
+					"Error: Service Request Failed.", ire);
 
 				_serviceClient.serviceOperationFailed(this, ire);
 				boolean retryRequired = _serviceClient
-						.serviceOperationShouldRetry(this, responseCode,
-								retryCount);
+					.serviceOperationShouldRetry(this, responseCode,
+						retryCount);
 				if (retryRequired) {
 					++retryCount;
 				} else {
 					raiseCompletion(ServiceResultStatus.FAILED, responseCode,
-							null);
+						null);
 
 					requestInProgress = false;
 				}
-			} 
+			}
 			catch (Exception ex) {
 				Logger.e(getClass().getName(),
-						"Error: Service Request Failed.", ex);
+					"Error: Service Request Failed.", ex);
 
 				_serviceClient.serviceOperationFailed(this, ex);
 				boolean retryRequired = _serviceClient
-						.serviceOperationShouldRetry(this, responseCode,
-								retryCount);
+					.serviceOperationShouldRetry(this, responseCode,
+						retryCount);
 				if (retryRequired) {
 					++retryCount;
 				} else {
 					raiseCompletion(ServiceResultStatus.FAILED, responseCode,
-							null);
+						null);
 
 					requestInProgress = false;
 				}
@@ -244,7 +283,7 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 	}
 
 	private byte[] readFromStream(InputStream in) throws InterruptedException,
-			IOException {
+	IOException {
 		BufferedInputStream bis = new BufferedInputStream(in);
 		ByteArrayBuffer baf = new ByteArrayBuffer(RESPONSE_BUFFER_SIZE);
 		int read = 0;
@@ -268,20 +307,20 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 	}
 
 	private int verifyResponseCode(HttpURLConnection connection)
-			throws IOException, InvalidResponseCodeException {
+		throws IOException, InvalidResponseCodeException {
 		int responseCode;
 		try {
 			responseCode = connection.getResponseCode();
 		} catch (IOException e) {
 			// Older Android versions have trouble handling 401 errors.
-			if (e.getMessage().contains("authentication challenge")) { 				
+			if (e.getMessage().contains("authentication challenge")) {
 				return HttpsURLConnection.HTTP_UNAUTHORIZED;
 			} else {
 				throw e;
 			}
 		}
 		if (responseCode < HTTP_OK_STATUS_CODE
-				|| responseCode >= HTTP_MULTIPLE_CHOICES_CODE) {
+			|| responseCode >= HTTP_MULTIPLE_CHOICES_CODE) {
 			String statusMessage = connection.getResponseMessage();
 			String errorMessage = "";
 			try {
@@ -289,14 +328,14 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 				InputStream in = connection.getErrorStream();
 				byte[] errorBody = readFromStream(in);
 				errorMessage = new String(errorBody,
-						ServiceClientConstants.UTF8_ENCODING);
+					ServiceClientConstants.UTF8_ENCODING);
 			} catch (Exception ex) {
 				Logger.e(this.getClass().getName(),
-						"No Error Body in Response", ex);
+					"No Error Body in Response", ex);
 			}
 
 			throw new InvalidResponseCodeException(responseCode, statusMessage,
-					errorMessage);
+				errorMessage);
 		}
 		return responseCode;
 	}
@@ -316,14 +355,15 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 	// [region] private methods
 
 	private void raiseCompletion(final ServiceResultStatus resultStatus,
-			final int responseCode, final TResult result) {
+		final int responseCode, final TResult result) {
 		// raise completion
 		if (_completion != null) {
 			Handler handler = new Handler(Looper.getMainLooper());
 			handler.post(new Runnable() {
+				@Override
 				public void run() {
 					_completion
-							.onCompletion(resultStatus, responseCode, result);
+					.onCompletion(resultStatus, responseCode, result);
 				}
 			});// end runOnUiThread
 
@@ -337,7 +377,7 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 	}
 
 	private static String addQueryStringParametersToUri(String uri,
-			Map<String, String> queryParameters)
+		Map<String, String> queryParameters)
 			throws UnsupportedEncodingException {
 		String uriWithQueryParams = uri;
 		if (queryParameters != null && !queryParameters.isEmpty()) {
@@ -348,9 +388,9 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 					uriWithQueryParams += "&";
 				}
 				uriWithQueryParams += field
-						+ "="
-						+ URLEncoder.encode(queryParameters.get(field),
-								ServiceClientConstants.UTF8_ENCODING);
+					+ "="
+					+ URLEncoder.encode(queryParameters.get(field),
+						ServiceClientConstants.UTF8_ENCODING);
 				addAmperstand = true;
 			}
 		}

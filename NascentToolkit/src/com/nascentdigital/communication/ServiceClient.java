@@ -1,8 +1,10 @@
-
 package com.nascentdigital.communication;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -22,6 +24,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+import android.graphics.Bitmap;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.nascentdigital.threading.PriorityThreadPoolExecutor;
@@ -32,14 +35,20 @@ public class ServiceClient
 {
 
 	// [region] class variables
-	
+
 	private static final Comparator<ServiceOperation<?, ?>> _operationTaskComparator;
+
+	public static enum MultiPartDataType
+	{
+		VIDEO,
+		IMAGE
+	}
 
 	// [endregion]
 
 	// [region] instance variables
 
-	private PriorityThreadPoolExecutor<ServiceOperation<?, ?>> _requestPool;
+	private final PriorityThreadPoolExecutor<ServiceOperation<?, ?>> _requestPool;
 	private int _requestTimeoutInMilliseconds;
 
 	// [endregion]
@@ -68,7 +77,7 @@ public class ServiceClient
 	static
 	{
 		_operationTaskComparator = new Comparator<ServiceOperation<?, ?>>()
-		{
+			{
 			@Override
 			public int compare(ServiceOperation<?, ?> lhs,
 				ServiceOperation<?, ?> rhs)
@@ -89,7 +98,7 @@ public class ServiceClient
 				}
 				return result;
 			}
-		};
+			};
 	}
 
 
@@ -125,22 +134,22 @@ public class ServiceClient
 	// [region] public methods
 
 	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
-		String uri, 
-		ServiceMethod method, 
+		String uri,
+		ServiceMethod method,
 		Map<String, String> headers,
-		Map<String, String> queryParameters, 
+		Map<String, String> queryParameters,
 		String body,
 		ServiceResponseFormat<TResponse> responseFormat,
 		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion)
-	{
+		{
 		return this.beginRequest(uri, method, headers, queryParameters, body,
 			responseFormat, responseTransform, completion,
 			ServiceOperationPriority.NORMAL, false);
-	}
+		}
 
 	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
-		String uri, 
+		String uri,
 		ServiceMethod method, Map<String, String> headers,
 		Map<String, String> queryParameters,
 		String body,
@@ -149,7 +158,7 @@ public class ServiceClient
 		ServiceClientCompletion<TResult> completion,
 		ServiceOperationPriority priority, boolean useCaches)
 
-	{
+		{
 		StringBodyDataProvider bodyDataProvider = null;
 		if (body != null)
 		{
@@ -159,35 +168,35 @@ public class ServiceClient
 		return this.beginRequest(uri, method, headers, queryParameters,
 			bodyDataProvider, responseFormat, responseTransform, completion,
 			priority, useCaches);
-	}
+		}
 
 	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
-		String uri, 
-		ServiceMethod method, 
+		String uri,
+		ServiceMethod method,
 		Map<String, String> headers,
-		Map<String, String> queryParameters, 
+		Map<String, String> queryParameters,
 		byte[] bodyData,
 		ServiceResponseFormat<TResponse> responseFormat,
 		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion)
-	{
+		{
 		return this.beginRequest(uri, method, headers, queryParameters,
 			bodyData, responseFormat, responseTransform, completion,
 			ServiceOperationPriority.NORMAL, false);
-	}
+		}
 
 	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
-		String uri, 
+		String uri,
 		ServiceMethod method, Map<String, String> headers,
-		Map<String, String> queryParameters, 
+		Map<String, String> queryParameters,
 		byte[] bodyData,
 		ServiceResponseFormat<TResponse> responseFormat,
 		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion,
-		ServiceOperationPriority priority, 
+		ServiceOperationPriority priority,
 		boolean useCaches)
 
-	{
+		{
 		ByteBodyDataProvider bodyDataProvider = null;
 		if (bodyData != null)
 		{
@@ -197,21 +206,20 @@ public class ServiceClient
 		return this.beginRequest(uri, method, headers, queryParameters,
 			bodyDataProvider, responseFormat, responseTransform, completion,
 			priority, useCaches);
-	}
-
+		}
 
 	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
-		String uri, 
-		ServiceMethod method, 
+		String uri,
+		ServiceMethod method,
 		Map<String, String> headers,
 		Map<String, String> queryParameters,
 		BodyDataProvider bodyDataProvider,
 		ServiceResponseFormat<TResponse> responseFormat,
 		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion,
-		ServiceOperationPriority priority, 
+		ServiceOperationPriority priority,
 		boolean useCaches)
-	{
+		{
 
 		ServiceOperation<TResponse, TResult> serviceOperation =
 			new ServiceOperation<TResponse, TResult>(uri, method, headers,
@@ -221,84 +229,191 @@ public class ServiceClient
 		this._requestPool.execute(serviceOperation);
 
 		return serviceOperation;
+		}
+
+
+	//To handle MultiPart POST requests
+	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
+		String uri,
+		ServiceMethod method,
+		Map<String, String> headers,
+		Map<String, String> queryParameters,
+		byte[] bodyData,
+		ServiceResponseFormat<TResponse> responseFormat,
+		ServiceResponseTransform<TResponse, TResult> serviceResponseTransform,
+		ServiceClientCompletion<TResult> completion,
+		ServiceOperationPriority priority,
+		boolean useCaches, boolean multiPart)
+		{
+
+		ByteBodyDataProvider bodyDataProvider = null;
+		if (bodyData != null)
+		{
+			bodyDataProvider = new ByteBodyDataProvider(bodyData);
+		}
+
+		ServiceOperation<TResponse, TResult> serviceOperation =
+			new ServiceOperation<TResponse, TResult>(uri, method, headers,
+				queryParameters, bodyDataProvider, responseFormat,
+				serviceResponseTransform, completion, priority, useCaches,
+				this._requestTimeoutInMilliseconds, this, multiPart);
+		this._requestPool.execute(serviceOperation);
+
+		return serviceOperation;
+		}
+
+	public String addMultiPartString(String content, String name, String contentType)
+	{
+		StringBuilder partData = new StringBuilder();
+		partData.append("Content-Disposition: form-data; name=\"" + name + "\"" + ServiceOperation.lineEnd);
+		partData.append("Content-Type: " + contentType + ServiceOperation.lineEnd + ServiceOperation.lineEnd);
+		partData.append(content);
+		partData.append(ServiceOperation.lineEnd);
+
+		return partData.toString();
 	}
 
-	
-	
-	
-	public <TResponse> TResponse transformDataIntoResponseFormat (ServiceOperation<TResponse, ?> serviceOperation,
-			byte[] responseData,
-			ServiceResponseFormat<TResponse> format)
+	public byte[] addMultiPartData(MultiPartDataType dataType, Object content, String name, String filename, String contentType)
 	{
-			// deserialize response
-			Object data = null;
-			try
-			{
-				switch (format.type)
+		String disp = "Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + filename + "\"" + ServiceOperation.lineEnd;
+		String cont = "Content-Type: " + contentType + ServiceOperation.lineEnd + ServiceOperation.lineEnd;
+
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+		switch (dataType)
+		{
+			case IMAGE:
+				Bitmap _image = (Bitmap) content;
+				try
 				{
-					case RAW:
-						data = responseData;
-						break;
-	
-					case STRING:					
-						data = new String(responseData, ServiceClientConstants.UTF8_ENCODING);
-						break;
-	
-					case FORM_ENCODED:
-						data = deserializeQueryString(responseData);						
-						break;
-	
-					case JSON:
-						data = deserializeJson(responseData);
-						break;
-	
-					case GSON:
-						data = deserializeGson(responseData);
-						break;
-						
-					case XML:
-						data = deserializeXml(responseData);
-						break;
-	
-					default:
-						throw new UnsupportedOperationException(
-							"Unexpected response format: " + format);
+					stream.write(disp.getBytes());
+					stream.write(cont.getBytes());
+					_image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+					break;
 				}
-			}
-			catch (UnsupportedEncodingException e)
+				catch (IOException e1)
+				{
+					return null;
+				}
+
+			case VIDEO:
+				String vid = (String) content;
+				File _video = new File(vid);
+
+				int bytesRead, bytesAvailable, bufferSize;
+				byte[] buffer;
+				int maxBufferSize = 2*1024*1024;
+
+				try
+				{
+					stream.write(disp.getBytes());
+					stream.write(cont.getBytes());
+
+					FileInputStream fileInputStream = new FileInputStream(_video);
+
+					bytesAvailable = fileInputStream.available();
+
+					bufferSize = Math.min(bytesAvailable, maxBufferSize);
+					buffer = new byte[bufferSize];
+
+					bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+					while(bytesRead > 0) {
+						stream.write(buffer);
+						bytesAvailable = fileInputStream.available();
+						bufferSize = Math.min(bytesAvailable, maxBufferSize);
+						bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+					}
+
+					fileInputStream.close();
+					break;
+				}
+				catch (IOException e)
+				{
+					return null;
+				}
+
+			default:
+				break;
+		}
+
+		byte[] byteArray = stream.toByteArray();
+		return byteArray;
+	}
+
+
+	public <TResponse> TResponse transformDataIntoResponseFormat (ServiceOperation<TResponse, ?> serviceOperation,
+		byte[] responseData,
+		ServiceResponseFormat<TResponse> format)
+	{
+		// deserialize response
+		Object data = null;
+		try
+		{
+			switch (format.type)
 			{
-				Logger.e(this.getClass().getName(), "Invalid encoding used.", e);
-				return null;
+				case RAW:
+					data = responseData;
+					break;
+
+				case STRING:
+					data = new String(responseData, ServiceClientConstants.UTF8_ENCODING);
+					break;
+
+				case FORM_ENCODED:
+					data = deserializeQueryString(responseData);
+					break;
+
+				case JSON:
+					data = deserializeJson(responseData);
+					break;
+
+				case GSON:
+					data = deserializeGson(responseData);
+					break;
+
+				case XML:
+					data = deserializeXml(responseData);
+					break;
+
+				default:
+					throw new UnsupportedOperationException(
+						"Unexpected response format: " + format);
 			}
-			catch (JSONException e)
-			{
-				Logger.e(this.getClass().getName(), "Error Parsing JSON", e);
-				return null;
-			}
-			catch (ParserConfigurationException e)
-			{
-				Logger.e(this.getClass().getName(), "Error Parsing XML", e);
-				return null;
-			}
-			catch (SAXException e)
-			{
-				Logger.e(this.getClass().getName(), "Error Parsing XML", e);
-				return null;
-			}
-			catch (IOException e)
-			{
-				Logger.e(this.getClass().getName(), "Error Parsing XML", e);
-				return null;
-			}
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			Logger.e(this.getClass().getName(), "Invalid encoding used.", e);
+			return null;
+		}
+		catch (JSONException e)
+		{
+			Logger.e(this.getClass().getName(), "Error Parsing JSON", e);
+			return null;
+		}
+		catch (ParserConfigurationException e)
+		{
+			Logger.e(this.getClass().getName(), "Error Parsing XML", e);
+			return null;
+		}
+		catch (SAXException e)
+		{
+			Logger.e(this.getClass().getName(), "Error Parsing XML", e);
+			return null;
+		}
+		catch (IOException e)
+		{
+			Logger.e(this.getClass().getName(), "Error Parsing XML", e);
+			return null;
+		}
 
 		@SuppressWarnings("unchecked")
 		TResponse result = (TResponse) data;
 		return result;
 	}
-	
+
 	private static final Document deserializeXml(byte[] responseData) throws ParserConfigurationException, SAXException, IOException
 	{
-		DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();		
+		DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document document = documentBuilder.parse(new ByteArrayInputStream(responseData));
 
 		return document;
@@ -307,35 +422,35 @@ public class ServiceClient
 	private static final Map<String, String> deserializeQueryString(byte[] responseData) throws UnsupportedEncodingException
 	{
 		String queryString = new String(responseData, ServiceClientConstants.UTF8_ENCODING);
-		
 
-	    Map<String, String> mappedQueryString = new HashMap<String, String>();
-	    if (queryString == null || queryString.length() == 0) {
-	        return mappedQueryString;
-	    }
-	    List<NameValuePair> list = URLEncodedUtils.parse(URI.create("http://localhost/?" + queryString), "UTF-8");
-	    for (NameValuePair pair : list) {
-	    	mappedQueryString.put(pair.getName(), pair.getValue());
-	    }
 
-	    return mappedQueryString;		
+		Map<String, String> mappedQueryString = new HashMap<String, String>();
+		if (queryString == null || queryString.length() == 0) {
+			return mappedQueryString;
+		}
+		List<NameValuePair> list = URLEncodedUtils.parse(URI.create("http://localhost/?" + queryString), "UTF-8");
+		for (NameValuePair pair : list) {
+			mappedQueryString.put(pair.getName(), pair.getValue());
+		}
+
+		return mappedQueryString;
 	}
-	
+
 	private static final JSONObject deserializeJson(byte[] responseData)
 		throws JSONException, UnsupportedEncodingException
-	{
+		{
 		String json = new String(responseData, ServiceClientConstants.UTF8_ENCODING);
 		JSONTokener jsonParser = new JSONTokener(json);
 		return (JSONObject)jsonParser.nextValue();
-	}
+		}
 
-	private static final JsonElement deserializeGson(byte[] responseData) 
+	private static final JsonElement deserializeGson(byte[] responseData)
 		throws UnsupportedEncodingException
-	{
+		{
 		String json = new String(responseData, ServiceClientConstants.UTF8_ENCODING);
 		JsonParser jsonParser = new JsonParser();
 		return jsonParser.parse(json);
-	}
+		}
 
 	// [endregion]
 
