@@ -288,7 +288,7 @@ public class ServiceClient
 				{
 					stream.write(disp.getBytes());
 					stream.write(cont.getBytes());
-					_image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+					_image.compress(Bitmap.CompressFormat.JPEG, 50, stream);
 					break;
 				}
 				catch (IOException e1)
