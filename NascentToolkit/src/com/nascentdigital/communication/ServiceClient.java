@@ -278,12 +278,15 @@ public class ServiceClient
 		String disp = "Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + filename + "\"" + ServiceOperation.lineEnd;
 		String cont = "Content-Type: " + contentType + ServiceOperation.lineEnd + ServiceOperation.lineEnd;
 
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		int maxBufferSize = 2*1024*1024;
+		ByteArrayOutputStream stream = null;
 
 		switch (dataType)
 		{
 			case IMAGE:
 				Bitmap _image = (Bitmap) content;
+				stream = new ByteArrayOutputStream(_image.getByteCount());
+
 				try
 				{
 					stream.write(disp.getBytes());
@@ -300,9 +303,12 @@ public class ServiceClient
 				String vid = (String) content;
 				File _video = new File(vid);
 
+				int initBufferSize = 1024*1024;
+				stream = new ByteArrayOutputStream(initBufferSize);
+
 				int bytesRead, bytesAvailable, bufferSize;
 				byte[] buffer;
-				int maxBufferSize = 2*1024*1024;
+				//int maxBufferSize = 2*1024*1024;
 
 				try
 				{
