@@ -2,6 +2,7 @@ package com.nascentdigital.communication;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -21,6 +22,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+import android.graphics.Bitmap;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.nascentdigital.threading.PriorityThreadPoolExecutor;
@@ -228,7 +230,7 @@ public class ServiceClient
 		}
 
 
-	//To handle MultiPart POST requests
+	//To handle MultiPart POST requests for files
 	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
 		String uri,
 		ServiceMethod method,
@@ -243,8 +245,6 @@ public class ServiceClient
 		ServiceOperationPriority priority,
 		boolean useCaches, boolean multiPart)
 		{
-
-
 		ServiceOperation<TResponse, TResult> serviceOperation =
 			new ServiceOperation<TResponse, TResult>(uri, method, headers,
 				queryParameters, beforeSegments, dataSegment, afterSegments, responseFormat,
@@ -255,8 +255,69 @@ public class ServiceClient
 		return serviceOperation;
 		}
 
+	//To handle MultiPart POST requests for bitmaps
+	public <TResponse, TResult> ServiceOperation<TResponse, TResult> beginRequest(
+		String uri,
+		ServiceMethod method,
+		Map<String, String> headers,
+		Map<String, String> queryParameters,
+		byte[] bodyData,
+		ServiceResponseFormat<TResponse> responseFormat,
+		ServiceResponseTransform<TResponse, TResult> serviceResponseTransform,
+		ServiceClientCompletion<TResult> completion,
+		ServiceOperationPriority priority,
+		boolean useCaches, boolean multiPart)
+		{
 
+		ByteBodyDataProvider bodyDataProvider = null;
+		if (bodyData != null)
+		{
+			bodyDataProvider = new ByteBodyDataProvider(bodyData);
+		}
 
+		ServiceOperation<TResponse, TResult> serviceOperation =
+			new ServiceOperation<TResponse, TResult>(uri, method, headers,
+				queryParameters, bodyDataProvider, responseFormat,
+				serviceResponseTransform, completion, priority, useCaches,
+				this._requestTimeoutInMilliseconds, this, multiPart);
+		this._requestPool.execute(serviceOperation);
+
+		return serviceOperation;
+		}
+
+	public String addMultiPartString(String content, String name, String contentType)
+	{
+		StringBuilder partData = new StringBuilder();
+		partData.append("Content-Disposition: form-data; name=\"" + name + "\"" + ServiceOperation.lineEnd);
+		partData.append("Content-Type: " + contentType + ServiceOperation.lineEnd + ServiceOperation.lineEnd);
+		partData.append(content);
+		partData.append(ServiceOperation.lineEnd);
+
+		return partData.toString();
+	}
+
+	public byte[] addMultiPartData(MultiPartDataType dataType, Object content, String name, String filename, String contentType)
+	{
+		String disp = "Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + filename + "\"" + ServiceOperation.lineEnd;
+		String cont = "Content-Type: " + contentType + ServiceOperation.lineEnd + ServiceOperation.lineEnd;
+
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+		Bitmap _image = (Bitmap) content;
+		try
+		{
+			stream.write(disp.getBytes());
+			stream.write(cont.getBytes());
+			_image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+		}
+		catch (IOException e1)
+		{
+			return null;
+		}
+
+		byte[] byteArray = stream.toByteArray();
+		return byteArray;
+	}
 
 	public <TResponse> TResponse transformDataIntoResponseFormat (ServiceOperation<TResponse, ?> serviceOperation,
 		byte[] responseData,
