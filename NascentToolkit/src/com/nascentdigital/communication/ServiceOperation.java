@@ -1,20 +1,30 @@
 package com.nascentdigital.communication;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Map;
+
 import javax.net.ssl.HttpsURLConnection;
+
 import org.apache.http.util.ByteArrayBuffer;
+
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
+
 import com.nascentdigital.util.Logger;
 
 public final class ServiceOperation<TResponse, TResult> implements Runnable {
@@ -26,6 +36,10 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 	public static final String twoHyphens = "--";
 	public static final String boundary =  "__com.nascentdigital.communication__";
 	public static final String lineEnd = "\r\n";
+
+	private static final String multiPartDivider = twoHyphens + boundary + lineEnd;
+	private static final String multiPartDataDivider = twoHyphens + boundary + lineEnd;
+	private static final String multiPartFinalDivider = twoHyphens + boundary + twoHyphens + lineEnd;
 	// [endregion]
 
 	// [region] instance variables
@@ -46,7 +60,10 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 	private final int _requestTimeoutInMilliseconds;
 	private Thread _currentThread;
 
-	private boolean _multiPart;
+	private boolean _multiPartRequest;
+	private MultiPartEntity [] _preDataEntities;
+	private MultiPartEntity [] _postDataEntities;
+	private MultiPartEntity _dataEntity;
 
 	// [endregion]
 
@@ -76,9 +93,12 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 		_requestTimeoutInMilliseconds = requestTimeoutInMilliseconds;
 	}
 
+	//Constructor for multiPart POST requests
 	public ServiceOperation(String uri, ServiceMethod method,
 		Map<String, String> headers, Map<String, String> queryParameters,
-		BodyDataProvider bodyDataProvider,
+		MultiPartEntity [] preDataEntities,
+		MultiPartEntity dataEntity,
+		MultiPartEntity [] postDataEntities,
 		ServiceResponseFormat<TResponse> responseFormat,
 		ServiceResponseTransform<TResponse, TResult> responseTransform,
 		ServiceClientCompletion<TResult> completion,
@@ -91,14 +111,17 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 		this.headers = headers;
 		this.queryParameters = queryParameters;
 
-		_bodyDataProvider = bodyDataProvider;
+		_bodyDataProvider = null;
+		_preDataEntities = preDataEntities;
+		_dataEntity = dataEntity;
+		_postDataEntities = postDataEntities;
 		_responseFormat = responseFormat;
 		_responseTransform = responseTransform;
 		_completion = completion;
 		_useCaches = useCaches;
 		_serviceClient = serviceClient;
 		_requestTimeoutInMilliseconds = requestTimeoutInMilliseconds;
-		_multiPart = multiPart;
+		_multiPartRequest = multiPart;
 	}
 
 	// [endregion]
@@ -143,37 +166,217 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 				connection.setUseCaches(_useCaches);
 				connection.setDoInput(true);
 
-				// create and send body data to request
-				byte[] bodyData = _bodyDataProvider == null ? null
-					: _bodyDataProvider.getBodyData();
-
 				// check for cancellation
 				throwIfInterrupted();
 
-				if (bodyData != null) {
-					connection.setRequestProperty("Content-Length", ""
-						+ bodyData.length);
+				//For MultiPart requests push data directly onto the 
+				//connection's output stream to avoid OutOfMemory errors
+				if(_multiPartRequest)
+				{
+					Bitmap image = null;
+					byte[] imageStream = null;
+					FileInputStream fileInputStream = null;
+					String dataDispositionAndType = "";
+					File _video = null;
 
-					if(_multiPart) {
-						connection.setRequestProperty("Accept-Encoding", "gzip, deflate");
-						connection.setRequestProperty("Accept", "*/*");
-						connection.setRequestProperty("Accept-Language", "en-us");
-						connection.setRequestProperty("Connection", "keep-alive");
-						connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+					int multiPartDividerLength = multiPartDivider.getBytes().length;
+					int contentLength = multiPartDividerLength;
+					
+					int preDataEntitiesSize = _preDataEntities.length;
+					int postDataEntitiesSize = _postDataEntities == null ? _dataEntity == null ? 0 : 1 : _postDataEntities.length;
+
+					String [] preDataEntityInstances = new String[preDataEntitiesSize];
+					String [] postDataEntityInstances = new String[postDataEntitiesSize];
+
+					//Must first calculate the content-length for the entire request
+					for (int i = 0; i < preDataEntitiesSize; i++)
+					{
+						//When no file to upload close request body after the last item in the preDataEntity array
+						if(_dataEntity == null)
+						{
+							if(i == _preDataEntities.length - 1)
+							{
+								preDataEntityInstances[i] = addMultiPartStringWithDivider(_preDataEntities[i].content, _preDataEntities[i].name, _preDataEntities[i].contentType, true);
+							}
+							else
+							{
+								preDataEntityInstances[i] = addMultiPartStringWithDivider(_preDataEntities[i].content, _preDataEntities[i].name, _preDataEntities[i].contentType, false);
+							}
+						}
+						else
+						{
+							preDataEntityInstances[i] = addMultiPartStringWithDivider(_preDataEntities[i].content, _preDataEntities[i].name, _preDataEntities[i].contentType, false);
+						}
+						contentLength += preDataEntityInstances[i].getBytes().length;
+						//Log.w("ANDY", ""+beforeSegmentContents[i].getBytes().length);
 					}
+
+					for (int i = 0; i < postDataEntitiesSize; i++)
+					{
+						//If no postDataEntity we close request body after the data entity
+						if(_postDataEntities == null) {
+							postDataEntityInstances[i] = multiPartFinalDivider;
+						}
+						//The last multiPart entity must be closed off correctly
+						else if(i == _postDataEntities.length - 1) {
+							postDataEntityInstances[i] = addMultiPartStringWithDivider(_postDataEntities[i].content, _postDataEntities[i].name, _postDataEntities[i].contentType, true);
+						}
+						else {
+							postDataEntityInstances[i] = addMultiPartStringWithDivider(_postDataEntities[i].content, _postDataEntities[i].name, _postDataEntities[i].contentType, false);
+						}
+						contentLength += postDataEntityInstances[i].getBytes().length;
+						//Log.w("ANDY", ""+postDataEntityInstances[i].getBytes().length);
+					}
+
+					if(_dataEntity != null)
+					{
+						dataDispositionAndType = addMultiPartDataDispositionAndType(_dataEntity.name, _dataEntity.filename, _dataEntity.contentType);
+
+						contentLength += dataDispositionAndType.getBytes().length;
+						//Log.w("ANDY", ""+dataDispositionAndType.getBytes().length);
+
+						switch (_dataEntity.dataType)
+						{
+							case IMAGE:
+								image = (Bitmap) _dataEntity.fileContent;
+
+								//Need to compress image to calculate the length for content-length header
+								ByteArrayOutputStream baos = new ByteArrayOutputStream();
+								image.compress(Bitmap.CompressFormat.JPEG, 100, baos); 
+								imageStream = baos.toByteArray();
+								baos.close();
+
+								//Log.w("ANDY", "Image bytes: "+imageSizeStream.length);
+								contentLength += imageStream.length;
+								break;
+							case VIDEO:
+								String vid = (String) _dataEntity.fileContent;
+								_video = new File(vid);
+								fileInputStream = new FileInputStream(_video);
+								Log.w("ANDY", "Video bytes: "+_video.length());
+								contentLength += _video.length();
+
+								break;
+							default:
+								raiseCompletion(ServiceResultStatus.FAILED, ServiceClientConstants.SERVICE_RESPONSE_STATUS_CODE_BAD_PARAMETERS, null);
+								requestInProgress = false;
+								break;
+						}
+
+						if(_postDataEntities != null)
+						{
+							contentLength += multiPartDataDivider.getBytes().length;
+							Log.w("ANDY", ""+multiPartDataDivider.getBytes().length);
+						}
+					}
+
+					//Set headers for MultiPart requests
+					connection.setRequestProperty("Content-Length", String.valueOf(contentLength));
+					connection.setRequestProperty("Accept-Encoding", "gzip, deflate");
+					connection.setRequestProperty("Accept", "*/*");
+					connection.setRequestProperty("Accept-Language", "en-us");
+					connection.setRequestProperty("Connection", "keep-alive");
+					connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+
 					connection.setDoOutput(true);
 
-					DataOutputStream wr = new DataOutputStream(
-						connection.getOutputStream());
-					wr.write(bodyData);
+					OutputStream wr = connection.getOutputStream();
+
+					//Write MultiPart entities inc. file to upload connection's output stream
+					wr.write(multiPartDivider.getBytes());
+					//Log.w("ANDY", multiPartDivider);
+
+					for(int i = 0; i < preDataEntitiesSize; i++)
+					{
+						wr.write(preDataEntityInstances[i].getBytes());
+						//Log.w("ANDY", new String(preDataEntityInstances[i].getBytes()));
+					}
+
+					if(_dataEntity != null)
+					{
+						wr.write(dataDispositionAndType.getBytes());
+						//Log.w("ANDY", dataDispositionAndType);
+
+						switch (_dataEntity.dataType)
+						{
+							case IMAGE:
+								wr.write(imageStream);
+								//image.compress(Bitmap.CompressFormat.JPEG, 100, wr);
+
+								break;
+							case VIDEO:
+								fileInputStream = new FileInputStream(_video);
+								byte[] buffer;
+								int maxBufferSize = 16*1024;
+
+								try
+								{
+									buffer = new byte[maxBufferSize];
+
+									int read = 0;
+									while ((read = fileInputStream.read(buffer)) != -1) {
+										wr.write(buffer, 0, read);
+									}
+									fileInputStream.close();
+									break;
+								}
+								catch (IOException e)
+								{
+									raiseCompletion(ServiceResultStatus.FAILED, ServiceClientConstants.SERVICE_RESPONSE_STATUS_CODE_SERVER_ERROR, null);
+									requestInProgress = false;
+								}
+								break;
+							default:
+								raiseCompletion(ServiceResultStatus.FAILED, ServiceClientConstants.SERVICE_RESPONSE_STATUS_CODE_BAD_PARAMETERS, null);
+								requestInProgress = false;
+								break;
+						}
+					}
+
+					if(_postDataEntities != null)
+					{
+						wr.write(multiPartDataDivider.getBytes());
+
+						//Log.w("ANDY", multiPartDataDivider);
+					}
+					for(int i = 0; i < postDataEntitiesSize; i++)
+					{
+						wr.write(postDataEntityInstances[i].getBytes());
+						//Log.w("ANDY", new String(postDataEntityInstances[i].getBytes()));
+					}
+
 					wr.flush();
 					wr.close();
 
 					// Verify the responseCode after sending output
 					responseCode = verifyResponseCode(connection);
-				} else {
-					connection.setDoOutput(false);
 				}
+				else
+				{
+					// create and send body data to request
+					byte[] bodyData = _bodyDataProvider == null ? null
+						: _bodyDataProvider.getBodyData();
+
+					if (bodyData != null) {
+						connection.setRequestProperty("Content-Length", ""
+							+ bodyData.length);
+
+						connection.setDoOutput(true);
+
+						DataOutputStream wr = new DataOutputStream(
+							connection.getOutputStream());
+						wr.write(bodyData);
+						wr.flush();
+						wr.close();
+
+						// Verify the responseCode after sending output
+						responseCode = verifyResponseCode(connection);
+					} else {
+						connection.setDoOutput(false);
+					}
+				}
+
+
 
 				// check for cancellation
 				throwIfInterrupted();
@@ -395,6 +598,37 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 			}
 		}
 		return uriWithQueryParams;
+	}
+
+	private String addMultiPartStringWithDivider(String content, String name, String contentType, boolean finalPart)
+	{
+		StringBuilder partData = new StringBuilder();
+		partData.append("Content-Disposition: form-data; name=\"" + name + "\"" + lineEnd);
+		partData.append("Content-Type: " + contentType + lineEnd + lineEnd);
+		partData.append(content);
+		partData.append(lineEnd);
+		if(finalPart)
+		{
+			partData.append(multiPartFinalDivider);
+		}
+		else
+		{
+			partData.append(multiPartDivider);
+		}
+
+		return partData.toString();
+	}
+
+	private String addMultiPartDataDispositionAndType(String name, String filename, String contentType)
+	{
+		String disp = "Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + filename + "\"" + lineEnd;
+		String cont = "Content-Type: " + contentType + lineEnd + lineEnd;
+
+		StringBuilder partData = new StringBuilder();
+		partData.append(disp);
+		partData.append(cont);
+
+		return partData.toString();
 	}
 
 	// [endregion]

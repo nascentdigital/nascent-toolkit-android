@@ -2,9 +2,6 @@ package com.nascentdigital.communication;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -24,7 +21,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-import android.graphics.Bitmap;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.nascentdigital.threading.PriorityThreadPoolExecutor;
@@ -238,7 +234,9 @@ public class ServiceClient
 		ServiceMethod method,
 		Map<String, String> headers,
 		Map<String, String> queryParameters,
-		byte[] bodyData,
+		MultiPartEntity [] beforeSegments,
+		MultiPartEntity dataSegment,
+		MultiPartEntity [] afterSegments,
 		ServiceResponseFormat<TResponse> responseFormat,
 		ServiceResponseTransform<TResponse, TResult> serviceResponseTransform,
 		ServiceClientCompletion<TResult> completion,
@@ -246,15 +244,10 @@ public class ServiceClient
 		boolean useCaches, boolean multiPart)
 		{
 
-		ByteBodyDataProvider bodyDataProvider = null;
-		if (bodyData != null)
-		{
-			bodyDataProvider = new ByteBodyDataProvider(bodyData);
-		}
 
 		ServiceOperation<TResponse, TResult> serviceOperation =
 			new ServiceOperation<TResponse, TResult>(uri, method, headers,
-				queryParameters, bodyDataProvider, responseFormat,
+				queryParameters, beforeSegments, dataSegment, afterSegments, responseFormat,
 				serviceResponseTransform, completion, priority, useCaches,
 				this._requestTimeoutInMilliseconds, this, multiPart);
 		this._requestPool.execute(serviceOperation);
@@ -262,89 +255,7 @@ public class ServiceClient
 		return serviceOperation;
 		}
 
-	public String addMultiPartString(String content, String name, String contentType)
-	{
-		StringBuilder partData = new StringBuilder();
-		partData.append("Content-Disposition: form-data; name=\"" + name + "\"" + ServiceOperation.lineEnd);
-		partData.append("Content-Type: " + contentType + ServiceOperation.lineEnd + ServiceOperation.lineEnd);
-		partData.append(content);
-		partData.append(ServiceOperation.lineEnd);
 
-		return partData.toString();
-	}
-
-	public byte[] addMultiPartData(MultiPartDataType dataType, Object content, String name, String filename, String contentType)
-	{
-		String disp = "Content-Disposition: form-data; name=\"" + name + "\"; filename=\"" + filename + "\"" + ServiceOperation.lineEnd;
-		String cont = "Content-Type: " + contentType + ServiceOperation.lineEnd + ServiceOperation.lineEnd;
-
-		int maxBufferSize = 2*1024*1024;
-		ByteArrayOutputStream stream = null;
-
-		switch (dataType)
-		{
-			case IMAGE:
-				Bitmap _image = (Bitmap) content;
-				stream = new ByteArrayOutputStream(_image.getByteCount());
-
-				try
-				{
-					stream.write(disp.getBytes());
-					stream.write(cont.getBytes());
-					_image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-					break;
-				}
-				catch (IOException e1)
-				{
-					return null;
-				}
-
-			case VIDEO:
-				String vid = (String) content;
-				File _video = new File(vid);
-
-				int initBufferSize = 1024*1024;
-				stream = new ByteArrayOutputStream(initBufferSize);
-
-				int bytesRead, bytesAvailable, bufferSize;
-				byte[] buffer;
-				//int maxBufferSize = 2*1024*1024;
-
-				try
-				{
-					stream.write(disp.getBytes());
-					stream.write(cont.getBytes());
-
-					FileInputStream fileInputStream = new FileInputStream(_video);
-
-					bytesAvailable = fileInputStream.available();
-
-					bufferSize = Math.min(bytesAvailable, maxBufferSize);
-					buffer = new byte[bufferSize];
-
-					bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-					while(bytesRead > 0) {
-						stream.write(buffer);
-						bytesAvailable = fileInputStream.available();
-						bufferSize = Math.min(bytesAvailable, maxBufferSize);
-						bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-					}
-
-					fileInputStream.close();
-					break;
-				}
-				catch (IOException e)
-				{
-					return null;
-				}
-
-			default:
-				break;
-		}
-
-		byte[] byteArray = stream.toByteArray();
-		return byteArray;
-	}
 
 
 	public <TResponse> TResponse transformDataIntoResponseFormat (ServiceOperation<TResponse, ?> serviceOperation,
