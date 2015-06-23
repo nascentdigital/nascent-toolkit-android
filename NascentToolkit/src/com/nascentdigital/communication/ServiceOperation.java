@@ -263,7 +263,6 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 							if(_postDataEntities != null)
 							{
 								contentLength += multiPartDataDivider.getBytes().length;
-								Log.w("ANDY", "4: "+multiPartDataDivider.getBytes().length);
 							}
 						}
 
