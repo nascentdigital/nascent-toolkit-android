@@ -24,7 +24,7 @@ public final class Logger
 
 	// [region] public methods
 
-	public static final void v(String context, String message)
+	public static void v(String context, String message)
 	{
 		if (level != null
 			&& level.allows(LogLevel.VERBOSE))
@@ -33,7 +33,7 @@ public final class Logger
 		}
 	}
 
-	public static final void d(String context, String message)
+	public static void d(String context, String message)
 	{
 		if (level != null
 			&& level.allows(LogLevel.DEBUG))
@@ -42,7 +42,7 @@ public final class Logger
 		}
 	}
 
-	public static final void i(String context, String message)
+	public static void i(String context, String message)
 	{
 		if (level != null
 			&& level.allows(LogLevel.INFO))
@@ -51,7 +51,7 @@ public final class Logger
 		}
 	}
 
-	public static final void w(String context, String message)
+	public static void w(String context, String message)
 	{
 		if (level != null
 			&& level.allows(LogLevel.WARN))
@@ -60,7 +60,7 @@ public final class Logger
 		}
 	}
 
-	public static final void e(String context, String message)
+	public static void e(String context, String message)
 	{
 		if (level != null
 			&& level.allows(LogLevel.ERROR))
@@ -69,7 +69,7 @@ public final class Logger
 		}
 	}
 
-	public static final void e(String context, String message, Exception e)
+	public static void e(String context, String message, Exception e)
 	{
 		if (level != null
 			&& level.allows(LogLevel.ERROR))

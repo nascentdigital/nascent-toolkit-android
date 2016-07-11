@@ -8,9 +8,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;

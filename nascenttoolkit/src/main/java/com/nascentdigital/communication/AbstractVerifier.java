@@ -206,10 +206,8 @@ public abstract class AbstractVerifier implements X509HostnameVerifier {
 
     public static boolean acceptableCountryWildcard(final String cn) {
         final String parts[] = cn.split("\\.");
-        if (parts.length != 3 || parts[2].length() != 2) {
-            return true; // it's not an attempt to wildcard a 2TLD within a country code
-        }
-        return Arrays.binarySearch(BAD_COUNTRY_2LDS, parts[1]) < 0;
+        // it's not an attempt to wildcard a 2TLD within a country code
+        return parts.length != 3 || parts[2].length() != 2 || Arrays.binarySearch(BAD_COUNTRY_2LDS, parts[1]) < 0;
     }
 
     public static String[] getCNs(final X509Certificate cert) {
@@ -278,10 +276,9 @@ public abstract class AbstractVerifier implements X509HostnameVerifier {
         if(c != null) {
             for (final List<?> aC : c) {
                 if (aC == null) { continue; }
-                final List<?> list = aC;
-                final int type = ((Integer) list.get(0)).intValue();
+                final int type = (Integer) aC.get(0);
                 if (type == subjectType) {
-                    final String s = (String) list.get(1);
+                    final String s = (String) aC.get(1);
                     subjectAltList.add(s);
                 }
             }

@@ -139,14 +139,13 @@ public class ObservableArrayList<T> extends BaseObservable<ArrayListObserver<T>>
 	public boolean addAll(int index, Collection<? extends T> collection)
 	{
 		// track insertion offset
-		int offset = index;
 		int length = collection.size();
 
 		// call base implementation
 		list.addAll(index, collection);
 
 		// notify listeners
-		raiseCollectionChanged(CollectionChangeType.INSERT, offset, length);
+		raiseCollectionChanged(CollectionChangeType.INSERT, index, length);
 
 		return true;
 	}
@@ -276,8 +275,8 @@ public class ObservableArrayList<T> extends BaseObservable<ArrayListObserver<T>>
 
 	// [region] helper methods
 
-	private final void raiseCollectionChanged(CollectionChangeType changeType,
-		int offset, int length)
+	private void raiseCollectionChanged(CollectionChangeType changeType,
+										int offset, int length)
 	{
 		CollectionChange change = new CollectionChange(changeType, offset, length);
 		setChanged();

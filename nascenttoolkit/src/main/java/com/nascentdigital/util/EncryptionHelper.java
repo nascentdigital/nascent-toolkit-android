@@ -2,14 +2,6 @@ package com.nascentdigital.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Base64;
-
-
-import java.security.MessageDigest;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 
 /**

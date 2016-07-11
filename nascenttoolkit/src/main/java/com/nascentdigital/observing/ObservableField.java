@@ -49,10 +49,9 @@ public class ObservableField<T extends Serializable> extends BaseObservable<Fiel
 
 	public void setValue(T value)
 	{
-		T oldValue = value;
 		this.value = value;
 		super.setChanged();
-		notifyObservers(oldValue);
+		notifyObservers(value);
 	}
 
 	// [endregion]

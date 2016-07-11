@@ -14,7 +14,6 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 
-import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.util.ByteArrayBuffer;
 import android.os.Handler;
 import android.os.Looper;

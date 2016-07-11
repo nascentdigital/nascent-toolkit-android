@@ -5,7 +5,7 @@ public enum ServiceOperationPriority {
 	 
 	 private final int priority;
 	 
-	 private ServiceOperationPriority(int priority) {
+	 ServiceOperationPriority(int priority) {
 		 this.priority = priority;
 	 }
 	 

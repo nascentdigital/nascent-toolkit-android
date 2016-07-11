@@ -35,7 +35,7 @@ class CacheableMethodAspectHelper {
     /**
      * Convenience method that returns the class- and method-name for a given join point.
      */
-    public static final String getJoinPointName(final JoinPoint joinPoint) {
+    public static String getJoinPointName(final JoinPoint joinPoint) {
         return joinPoint.getThis().getClass().getSimpleName() + "build/intermediates/exploded-aar/com.instabug.library/instabugsupport/1.7.4/res" + joinPoint.getSignature().getName();
     }
 
@@ -44,11 +44,11 @@ class CacheableMethodAspectHelper {
      * @param joinPoint
      * @return string representing the arguments of this join point
      */
-    public static final String getJoinPointArgs(final JoinPoint joinPoint) {
+    public static String getJoinPointArgs(final JoinPoint joinPoint) {
         final StringBuilder buf = new StringBuilder();
         for (final Object arg : joinPoint.getArgs()) {
             if ( arg != null && !(arg instanceof CacheableCompletion) ) {
-                buf.append(arg.getClass().getSimpleName() + "-" + arg + "+");
+                buf.append(arg.getClass().getSimpleName()).append("-").append(arg).append("+");
             }
         }
         return buf.toString().replaceAll("\\+$", "");

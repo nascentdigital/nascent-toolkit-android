@@ -25,7 +25,7 @@ public enum LogLevel
 
 	// [region] constructors
 
-	private LogLevel(int value)
+	LogLevel(int value)
 	{
 		this.value = value;
 	}

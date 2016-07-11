@@ -49,7 +49,7 @@ public class NetworkConnectivityListener {
             String action = intent.getAction();
 
             if (!action.equals(ConnectivityManager.CONNECTIVITY_ACTION) ||
-                    mListening == false) {
+                    !mListening) {
                 Log.w(TAG, "onReceived() called with " + mState.toString() + " and " + intent);
                 return;
             }
