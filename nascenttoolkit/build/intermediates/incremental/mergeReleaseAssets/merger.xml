@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/src/main/assets"/><source path="/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/generated/assets/shaders/release"/></dataSet><dataSet config="release"><source path="/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/src/release/assets"/></dataSet></merger>
