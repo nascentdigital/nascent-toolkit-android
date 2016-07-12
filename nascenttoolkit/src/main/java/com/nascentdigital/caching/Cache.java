@@ -21,14 +21,15 @@ import java.util.HashMap;
 public class Cache implements Serializable
 {
     //region static fields
-    private static Cache instance;
+    private transient static Cache instance;
     //endregion
 
     //region fields
-    private final String stateKey = this.getClass().getName();
     private HashMap<String, CacheableResult<?>> cache = new HashMap<>();
-    private CachePersistanceMode persistanceMode = CachePersistanceMode.IN_MEMORY_ONLY;
-    private Context context = null;
+
+    private transient final String stateKey = this.getClass().getName();
+    private transient CachePersistanceMode persistanceMode = CachePersistanceMode.IN_MEMORY_ONLY;
+    private transient Context context = null;
     //endregion
 
     //region static methods
