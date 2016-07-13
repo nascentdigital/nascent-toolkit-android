@@ -16,5 +16,9 @@ project build.gradle file:
 module build.gradle file:
 
 `dependencies {
-    compile 'com.nascentdigital.nascenttoolkit:nascenttoolkit:2.1.0'
+    compile 'com.nascentdigital.nascenttoolkit:nascenttoolkit:3.0.0'
 }`
+
+
+for instructions on how to update this library on Maven, follow this link:
+http://code.tutsplus.com/tutorials/creating-and-publishing-an-android-library--cms-24582
