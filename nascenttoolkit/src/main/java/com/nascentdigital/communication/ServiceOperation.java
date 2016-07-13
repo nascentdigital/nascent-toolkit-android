@@ -1,5 +1,12 @@
 package com.nascentdigital.communication;
 
+import android.os.Handler;
+import android.os.Looper;
+
+import com.nascentdigital.util.Logger;
+
+import org.apache.http.util.ByteArrayBuffer;
+
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
@@ -11,13 +18,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Map;
+
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-
-import org.apache.http.util.ByteArrayBuffer;
-import android.os.Handler;
-import android.os.Looper;
-import com.nascentdigital.util.Logger;
 
 public final class ServiceOperation<TResponse, TResult> implements Runnable {
 	// [region] constants
@@ -38,12 +41,15 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 	private final BodyDataProvider _bodyDataProvider;
 	private final ServiceResponseFormat<TResponse> _responseFormat;
 	private final ServiceResponseTransform<TResponse, TResult> _responseTransform;
+	private ServiceResponseHeaders _responseHeaders;
+	private ServiceResultContainer _resultContainer;
 	private final ServiceClientCompletion<TResult> _completion;
 	private final boolean _useCaches;
 	private final ServiceClient _serviceClient;
 	private final int _requestTimeoutInMilliseconds;
 	private Thread _currentThread;
 	private final SSLContextFactory _sslContextFactory;
+
 
 	// [endregion]
 
@@ -162,7 +168,7 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 				// Get response
 				in = connection.getInputStream();
 
-
+				_responseHeaders = new ServiceResponseHeaders(connection.getHeaderFields());
 
 				// Check for cancellation
 				throwIfInterrupted();
@@ -371,8 +377,12 @@ public final class ServiceOperation<TResponse, TResult> implements Runnable {
 		// raise completion
 		if (_completion != null) {
 			Handler handler = new Handler(Looper.getMainLooper());
+			_resultContainer = new ServiceResultContainer(_responseHeaders,
+					responseCode,
+					result,
+					resultStatus);
 			handler.post(() -> _completion
-                    .onCompletion(resultStatus, responseCode, result));// end runOnUiThread
+                    .onCompletion(_resultContainer));// end runOnUiThread
 
 		}
 	}

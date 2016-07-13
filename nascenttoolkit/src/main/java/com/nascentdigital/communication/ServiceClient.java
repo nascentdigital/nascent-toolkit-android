@@ -4,6 +4,19 @@ package com.nascentdigital.communication;
 
 import android.util.Log;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.nascentdigital.threading.PriorityThreadPoolExecutor;
+import com.nascentdigital.util.Logger;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -18,17 +31,6 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.nascentdigital.threading.PriorityThreadPoolExecutor;
-import com.nascentdigital.util.Logger;
 
 
 public class ServiceClient
@@ -294,7 +296,7 @@ public class ServiceClient
 		return result;
 	}
 	
-	private static Document deserializeXml(byte[] responseData) throws ParserConfigurationException, SAXException, IOException
+	private static final Document deserializeXml(byte[] responseData) throws ParserConfigurationException, SAXException, IOException
 	{
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
@@ -326,8 +328,9 @@ public class ServiceClient
 
 			// remaining parser logic
             DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
+            Document document = documentBuilder.parse(new ByteArrayInputStream(responseData));
 
-			return documentBuilder.parse(new ByteArrayInputStream(responseData));
+            return document;
 		}
         catch (Exception e) {
             // This should catch a failed setFeature feature
@@ -338,7 +341,7 @@ public class ServiceClient
 
 	}
 
-	private static Map<String, String> deserializeQueryString(byte[] responseData) throws UnsupportedEncodingException
+	private static final Map<String, String> deserializeQueryString(byte[] responseData) throws UnsupportedEncodingException
 	{
 		String queryString = new String(responseData, ServiceClientConstants.UTF8_ENCODING);
 		
@@ -355,7 +358,7 @@ public class ServiceClient
 	    return mappedQueryString;		
 	}
 	
-	private static JSONObject deserializeJson(byte[] responseData)
+	private static final JSONObject deserializeJson(byte[] responseData)
 		throws JSONException, UnsupportedEncodingException
 	{
 		String json = new String(responseData, ServiceClientConstants.UTF8_ENCODING);
@@ -363,7 +366,7 @@ public class ServiceClient
 		return (JSONObject)jsonParser.nextValue();
 	}
 
-	private static JsonElement deserializeGson(byte[] responseData)
+	private static final JsonElement deserializeGson(byte[] responseData) 
 		throws UnsupportedEncodingException
 	{
 		String json = new String(responseData, ServiceClientConstants.UTF8_ENCODING);
