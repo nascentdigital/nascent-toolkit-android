@@ -47,10 +47,20 @@ public class StringHelper  {
      * @param value string value (must be in numerical format)
      * @return string representation rounded to 0 decimal points
      */
+    @Deprecated
     public static String roundNoDecimal(String value) {
+        return roundNoDecimal(value, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Rounds a string representation of a number to 0 decimal points
+     * @param value string value (must be in numerical format)
+     * @return string representation rounded to 0 decimal points
+     */
+    public static String roundNoDecimal(String value, RoundingMode mode) {
         value = value.replace(",", ".");
         BigDecimal bd = new BigDecimal(value);
-        bd = bd.setScale(0, RoundingMode.HALF_UP);
+        bd = bd.setScale(0, mode);
         return bd.toString();
     }
 
@@ -59,10 +69,20 @@ public class StringHelper  {
      * @param value string value (must be in numerical format)
      * @return string representation rounded to 1 decimal point
      */
+    @Deprecated
     public static String roundOneDecimal(String value) {
+        return roundOneDecimal(value, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Rounds a string representation of a number to 1 decimal point
+     * @param value string value (must be in numerical format)
+     * @return string representation rounded to 1 decimal point
+     */
+    public static String roundOneDecimal(String value, RoundingMode mode) {
         value = value.replace(",", ".");
         BigDecimal bd = new BigDecimal(value);
-        bd = bd.setScale(1, RoundingMode.HALF_UP);
+        bd = bd.setScale(1, mode);
         return bd.toString();
     }
 
@@ -71,9 +91,19 @@ public class StringHelper  {
      * @param value string value (must be in numerical format)
      * @return string representation rounded to 2 decimal points
      */
+    @Deprecated
     public static double roundTwoDecimal(double value){
+        return roundTwoDecimal(value, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Rounds a string representation of a number to 2 decimal points
+     * @param value string value (must be in numerical format)
+     * @return string representation rounded to 2 decimal points
+     */
+    public static double roundTwoDecimal(double value, RoundingMode mode){
         BigDecimal bd = new BigDecimal(value);
-        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        bd = bd.setScale(2, mode);
         return bd.doubleValue();
     }
 
