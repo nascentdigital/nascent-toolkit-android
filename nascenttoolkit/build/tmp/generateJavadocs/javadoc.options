@@ -1,8 +1,8 @@
 -classpath '/Users/ahinton/Development/eclipse-standard-kepler-SR2-macosx-cocoa-x86_64/sdk/platforms/android-24/android.jar:/Users/ahinton/Development/eclipse-standard-kepler-SR2-macosx-cocoa-x86_64/sdk/platforms/android-24/optional/org.apache.http.legacy.jar'
 -d '/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/docs/javadoc'
--doctitle 'nascenttoolkit 3.0.0 API'
+-doctitle 'nascenttoolkit 3.1.1 API'
 -quiet 
--windowtitle 'nascenttoolkit 3.0.0 API'
+-windowtitle 'nascenttoolkit 3.1.1 API'
 '/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/src/main/java/com/nascentdigital/caching/annotations/Cacheable.java'
 '/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/src/main/java/com/nascentdigital/caching/annotations/NotCacheable.java'
 '/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/src/main/java/com/nascentdigital/caching/aspects/CacheableMethodAspect.aj'

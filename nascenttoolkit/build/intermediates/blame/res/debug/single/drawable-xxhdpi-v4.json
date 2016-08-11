@@ -40,12 +40,12 @@
         "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-xxhdpi-v4/abc_scrubber_track_mtrl_alpha.9.png"
     },
     {
-        "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/abc_btn_check_to_on_mtrl_000.png",
-        "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-xxhdpi-v4/abc_btn_check_to_on_mtrl_000.png"
-    },
-    {
         "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/abc_textfield_activated_mtrl_alpha.9.png",
         "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-xxhdpi-v4/abc_textfield_activated_mtrl_alpha.9.png"
+    },
+    {
+        "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/abc_btn_check_to_on_mtrl_000.png",
+        "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-xxhdpi-v4/abc_btn_check_to_on_mtrl_000.png"
     },
     {
         "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/abc_list_focused_holo.9.png",
@@ -56,12 +56,12 @@
         "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-xxhdpi-v4/abc_scrubber_control_off_mtrl_alpha.png"
     },
     {
-        "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/abc_ic_star_black_36dp.png",
-        "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-xxhdpi-v4/abc_ic_star_black_36dp.png"
-    },
-    {
         "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/abc_textfield_search_activated_mtrl_alpha.9.png",
         "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-xxhdpi-v4/abc_textfield_search_activated_mtrl_alpha.9.png"
+    },
+    {
+        "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/abc_ic_star_black_36dp.png",
+        "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-xxhdpi-v4/abc_ic_star_black_36dp.png"
     },
     {
         "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/abc_ab_share_pack_mtrl_alpha.9.png",
@@ -96,12 +96,12 @@
         "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-xxhdpi-v4/abc_cab_background_top_mtrl_alpha.9.png"
     },
     {
-        "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/abc_ic_star_black_16dp.png",
-        "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-xxhdpi-v4/abc_ic_star_black_16dp.png"
-    },
-    {
         "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/abc_btn_switch_to_on_mtrl_00001.9.png",
         "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-xxhdpi-v4/abc_btn_switch_to_on_mtrl_00001.9.png"
+    },
+    {
+        "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/abc_ic_star_black_16dp.png",
+        "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-xxhdpi-v4/abc_ic_star_black_16dp.png"
     },
     {
         "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/abc_textfield_default_mtrl_alpha.9.png",
