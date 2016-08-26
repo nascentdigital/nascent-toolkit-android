@@ -26,12 +26,15 @@ public class NetworkConnectivityListener {
 
     private Context mContext;
     private final HashMap<Handler, Integer> mHandlers = new HashMap<>();
-    private State mState;
+    private State mPreviousState;
+    private State mCurrentState;
     private boolean mListening;
     private String mReason;
     private boolean mIsFailover;
 
-    /** Network connectivity information */
+    /**
+     * Network connectivity information
+     */
     private NetworkInfo mNetworkInfo;
 
     /**
@@ -50,20 +53,27 @@ public class NetworkConnectivityListener {
 
             if (!action.equals(ConnectivityManager.CONNECTIVITY_ACTION) ||
                     !mListening) {
-                Log.w(TAG, "onReceived() called with " + mState.toString() + " and " + intent);
+                Log.w(TAG, "onReceived() called with " + mCurrentState.toString() + " and " + intent);
                 return;
             }
 
-            boolean noConnectivity =
-                    intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-
-            if (noConnectivity) {
-                mState = State.NOT_CONNECTED;
-            } else {
-                mState = State.CONNECTED;
+            boolean noConnectivity = false;
+            if (intent.getExtras().containsKey(ConnectivityManager.EXTRA_NO_CONNECTIVITY)) {
+                noConnectivity = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+            }
+            // To support older versions of the Android OS, we can pull the EXTRA_NETWORK_INFO since
+            // EXTRA_NO_CONNECTIVITY will not be provided
+            else if (intent.getExtras().containsKey(ConnectivityManager.EXTRA_NETWORK_INFO)) {
+                mNetworkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+                noConnectivity = !mNetworkInfo.isConnected();
             }
 
-            mNetworkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+            mPreviousState = mCurrentState;
+            if (noConnectivity) {
+                mCurrentState = State.NOT_CONNECTED;
+            } else {
+                mCurrentState = State.CONNECTED;
+            }
             mOtherNetworkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_OTHER_NETWORK_INFO);
 
             mReason = intent.getStringExtra(ConnectivityManager.EXTRA_REASON);
@@ -71,9 +81,9 @@ public class NetworkConnectivityListener {
                     intent.getBooleanExtra(ConnectivityManager.EXTRA_IS_FAILOVER, false);
 
             if (DBG) {
-                Log.d(TAG, "onReceive(): mNetworkInfo=" + mNetworkInfo +  " mOtherNetworkInfo = "
+                Log.d(TAG, "onReceive(): mNetworkInfo=" + mNetworkInfo + " mOtherNetworkInfo = "
                         + (mOtherNetworkInfo == null ? "[none]" : mOtherNetworkInfo +
-                        " noConn=" + noConnectivity) + " mState=" + mState.toString());
+                        " noConn=" + noConnectivity) + " mCurrentState=" + mCurrentState.toString());
             }
 
             // Notifiy any handlers.
@@ -89,7 +99,9 @@ public class NetworkConnectivityListener {
     public enum State {
         UNKNOWN,
 
-        /** This state is returned if there is connectivity to any network **/
+        /**
+         * This state is returned if there is connectivity to any network
+         **/
         CONNECTED,
         /**
          * This state is returned if there is no connectivity to any network. This is set
@@ -107,12 +119,13 @@ public class NetworkConnectivityListener {
      * Create a new NetworkConnectivityListener.
      */
     public NetworkConnectivityListener() {
-        mState = State.UNKNOWN;
+        mCurrentState = State.UNKNOWN;
         mReceiver = new ConnectivityBroadcastReceiver();
     }
 
     /**
      * This method starts listening for network connectivity state changes.
+     *
      * @param context
      */
     public synchronized void startListening(Context context) {
@@ -146,7 +159,7 @@ public class NetworkConnectivityListener {
      * the network connectivity state changes.
      *
      * @param target The target handler.
-     * @param what The what code to be used when posting a message to the handler.
+     * @param what   The what code to be used when posting a message to the handler.
      */
     public void registerHandler(Handler target, int what) {
         mHandlers.put(target, what);
@@ -154,18 +167,34 @@ public class NetworkConnectivityListener {
 
     /**
      * This methods unregisters the specified Handler.
+     *
      * @param target
      */
     public void unregisterHandler(Handler target) {
         mHandlers.remove(target);
     }
 
+    /**
+     * Provides the previous state of the network before the most recent connectivity update.
+     *
+     * @return previous network connectivity state.
+     */
+    public State getPreviousState() {
+        return mPreviousState;
+    }
+
+    /**
+     * Provides the current state of the network provided by the most recent connectivity update.
+     *
+     * @return current network connectivity state.
+     */
     public State getState() {
-        return mState;
+        return mCurrentState;
     }
 
     /**
      * Return the NetworkInfo associated with the most recent connectivity event.
+     *
      * @return {@code NetworkInfo} for the network that had the most recent connectivity event.
      */
     public NetworkInfo getNetworkInfo() {
@@ -188,6 +217,7 @@ public class NetworkConnectivityListener {
     /**
      * Returns true if the most recent event was for an attempt to switch over to
      * a new network following loss of connectivity on another network.
+     *
      * @return {@code true} if this was a failover attempt, {@code false} otherwise.
      */
     public boolean isFailover() {
@@ -197,6 +227,7 @@ public class NetworkConnectivityListener {
     /**
      * An optional reason for the connectivity state change may have been supplied.
      * This returns it.
+     *
      * @return the reason for the state change, if available, or {@code null}
      * otherwise.
      */
