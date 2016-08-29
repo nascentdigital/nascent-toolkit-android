@@ -1,0 +1,74 @@
+[
+    {
+        "outputFile": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/values-ldltr-v21/values-ldltr-v21.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 112,
+                    "endOffset": 163
+                },
+                "from": {
+                    "file": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ldltr-v21/values-ldltr-v21.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 112,
+                        "endOffset": 163
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "outputFile": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/values-ldltr-v21/values-ldltr-v21.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 112,
+                    "endOffset": 163
+                },
+                "from": {
+                    "file": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ldltr-v21/values-ldltr-v21.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 112,
+                        "endOffset": 163
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "outputFile": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/values-ldltr-v21/values-ldltr-v21.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 112,
+                    "endOffset": 163
+                },
+                "from": {
+                    "file": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/values-ldltr-v21/values-ldltr-v21.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 112,
+                        "endOffset": 163
+                    }
+                }
+            }
+        ]
+    }
+]
