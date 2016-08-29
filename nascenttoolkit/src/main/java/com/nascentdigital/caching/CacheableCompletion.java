@@ -16,6 +16,7 @@ public abstract class CacheableCompletion<T extends Serializable>
     //region private fields
     private int cacheEntryExpiresInMins = 0;
     private String cacheKey = "";
+    private boolean hasCompletionBeenCalled = false;
 
     //endregion
 
@@ -30,6 +31,12 @@ public abstract class CacheableCompletion<T extends Serializable>
 
     public synchronized void onCompletion (CacheableResult<T> result)
     {
+        if (hasCompletionBeenCalled)
+        {
+            //Do not allow duplicate calls to completion
+            return;
+        }
+
         if (result.status == CachedResultStatus.LIVE)
         {
             if (cacheEntryExpiresInMins > 0 && !StringHelper.isNullOrWhitespace(cacheKey))
