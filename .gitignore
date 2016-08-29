@@ -20,3 +20,13 @@ local.properties
 .project
 .settings/
 project.properties
+
+# Android studio project files
+*.iml
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/captures
