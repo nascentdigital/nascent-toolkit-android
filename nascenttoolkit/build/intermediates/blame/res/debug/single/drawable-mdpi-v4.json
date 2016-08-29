@@ -100,12 +100,12 @@
         "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-mdpi-v4/abc_ab_share_pack_mtrl_alpha.9.png"
     },
     {
-        "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-mdpi-v4/abc_textfield_activated_mtrl_alpha.9.png",
-        "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-mdpi-v4/abc_textfield_activated_mtrl_alpha.9.png"
-    },
-    {
         "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-mdpi-v4/abc_menu_hardkey_panel_mtrl_mult.9.png",
         "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-mdpi-v4/abc_menu_hardkey_panel_mtrl_mult.9.png"
+    },
+    {
+        "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-mdpi-v4/abc_textfield_activated_mtrl_alpha.9.png",
+        "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable-mdpi-v4/abc_textfield_activated_mtrl_alpha.9.png"
     },
     {
         "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/drawable-mdpi-v4/abc_switch_track_mtrl_alpha.9.png",

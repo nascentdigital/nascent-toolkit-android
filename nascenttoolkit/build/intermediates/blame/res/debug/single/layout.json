@@ -4,12 +4,12 @@
         "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/notification_media_action.xml"
     },
     {
-        "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_search_dropdown_item_icons_2line.xml",
-        "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/abc_search_dropdown_item_icons_2line.xml"
-    },
-    {
         "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_action_mode_close_item_material.xml",
         "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/abc_action_mode_close_item_material.xml"
+    },
+    {
+        "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_search_dropdown_item_icons_2line.xml",
+        "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/abc_search_dropdown_item_icons_2line.xml"
     },
     {
         "merged": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/layout/notification_template_media.xml",
@@ -20,12 +20,12 @@
         "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/support_simple_spinner_dropdown_item.xml"
     },
     {
-        "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_popup_menu_header_item_layout.xml",
-        "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/abc_popup_menu_header_item_layout.xml"
-    },
-    {
         "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_list_menu_item_layout.xml",
         "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/abc_list_menu_item_layout.xml"
+    },
+    {
+        "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_popup_menu_header_item_layout.xml",
+        "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/abc_popup_menu_header_item_layout.xml"
     },
     {
         "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_screen_toolbar.xml",
@@ -36,12 +36,12 @@
         "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/select_dialog_multichoice_material.xml"
     },
     {
-        "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_dialog_title_material.xml",
-        "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/abc_dialog_title_material.xml"
-    },
-    {
         "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_screen_content_include.xml",
         "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/abc_screen_content_include.xml"
+    },
+    {
+        "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_dialog_title_material.xml",
+        "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/abc_dialog_title_material.xml"
     },
     {
         "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_action_bar_title_item.xml",
@@ -68,12 +68,12 @@
         "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/abc_action_menu_item_layout.xml"
     },
     {
-        "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/layout/support_simple_spinner_dropdown_item.xml",
-        "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/support_simple_spinner_dropdown_item.xml"
-    },
-    {
         "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/layout/notification_template_part_chronometer.xml",
         "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/notification_template_part_chronometer.xml"
+    },
+    {
+        "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/layout/support_simple_spinner_dropdown_item.xml",
+        "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/support_simple_spinner_dropdown_item.xml"
     },
     {
         "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_screen_simple_overlay_action_mode.xml",
@@ -92,12 +92,12 @@
         "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/abc_alert_dialog_button_bar_material.xml"
     },
     {
-        "merged": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/layout/notification_template_part_time.xml",
-        "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/notification_template_part_time.xml"
-    },
-    {
         "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_action_mode_close_item_material.xml",
         "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/abc_action_mode_close_item_material.xml"
+    },
+    {
+        "merged": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/debug/layout/notification_template_part_time.xml",
+        "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/layout/notification_template_part_time.xml"
     },
     {
         "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/debug/layout/abc_action_bar_up_container.xml",

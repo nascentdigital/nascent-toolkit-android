@@ -28,12 +28,12 @@
         "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_edit_text_material.xml"
     },
     {
-        "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_switch_thumb_material.xml",
-        "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_switch_thumb_material.xml"
-    },
-    {
         "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_ic_ab_back_material.xml",
         "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_ic_ab_back_material.xml"
+    },
+    {
+        "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_switch_thumb_material.xml",
+        "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_switch_thumb_material.xml"
     },
     {
         "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_ic_clear_material.xml",
@@ -64,16 +64,16 @@
         "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_ic_ab_back_material.xml"
     },
     {
-        "merged": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_cab_background_top_material.xml",
-        "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_cab_background_top_material.xml"
+        "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_btn_radio_material.xml",
+        "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_btn_radio_material.xml"
     },
     {
         "merged": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_list_selector_background_transition_holo_dark.xml",
         "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_list_selector_background_transition_holo_dark.xml"
     },
     {
-        "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_btn_radio_material.xml",
-        "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_btn_radio_material.xml"
+        "merged": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_cab_background_top_material.xml",
+        "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_cab_background_top_material.xml"
     },
     {
         "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_ic_clear_material.xml",
@@ -100,12 +100,12 @@
         "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_ic_voice_search_api_material.xml"
     },
     {
-        "merged": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_btn_radio_material.xml",
-        "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_btn_radio_material.xml"
-    },
-    {
         "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_btn_default_mtrl_shape.xml",
         "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_btn_default_mtrl_shape.xml"
+    },
+    {
+        "merged": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_btn_radio_material.xml",
+        "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_btn_radio_material.xml"
     },
     {
         "merged": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_item_background_holo_dark.xml",
@@ -132,12 +132,12 @@
         "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_ratingbar_material.xml"
     },
     {
-        "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_text_cursor_material.xml",
-        "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_text_cursor_material.xml"
-    },
-    {
         "merged": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_ic_arrow_drop_right_black_24dp.xml",
         "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_ic_arrow_drop_right_black_24dp.xml"
+    },
+    {
+        "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_text_cursor_material.xml",
+        "source": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_text_cursor_material.xml"
     },
     {
         "merged": "/Users/adam/StudioProjects/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_btn_default_mtrl_shape.xml",
@@ -156,12 +156,12 @@
         "source": "/Users/ahinton/Documents/Development/TELUS-My-Account-Android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_list_selector_background_transition_holo_dark.xml"
     },
     {
-        "merged": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_ic_ab_back_material.xml",
-        "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_ic_ab_back_material.xml"
-    },
-    {
         "merged": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_ic_menu_overflow_material.xml",
         "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_ic_menu_overflow_material.xml"
+    },
+    {
+        "merged": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_ic_ab_back_material.xml",
+        "source": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.0.0/res/drawable/abc_ic_ab_back_material.xml"
     },
     {
         "merged": "/Users/ahinton/Documents/Development/nascent-toolkit-android/nascenttoolkit/build/intermediates/res/merged/androidTest/debug/drawable/abc_btn_check_material.xml",
