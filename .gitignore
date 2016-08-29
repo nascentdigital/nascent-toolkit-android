@@ -24,9 +24,9 @@ project.properties
 # Android studio project files
 *.iml
 .gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
+/nascenttoolkit/local.properties
+/nascenttoolkit/.idea/workspace.xml
+/nascenttoolkit/.idea/libraries
 .DS_Store
-/build
-/captures
+/nascenttoolkit/build
+/nascenttoolkit/captures
