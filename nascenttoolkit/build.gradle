@@ -31,7 +31,8 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group = 'com.nascentdigital.nascenttoolkit' // Change this to match your package name
-version = '3.1.6' // Change this to match your version number
+version = "3.1.7" // Update this to new version
+def version_tag = version
 //endregion
 
 
@@ -113,10 +114,10 @@ bintray {
         name = 'com.nascentdigital.nascenttoolkit'
         userOrg = 'nascent'
         version {
-            name = '3.1.6'
+            name = version_tag
             desc = 'A toolkit to provide common code utils to Android projects.'
             released  = new Date()
-            vcsTag = 'v3.1.6'
+            vcsTag = "v" + version_tag
         }
 
         licenses = ['Apache-2.0']
