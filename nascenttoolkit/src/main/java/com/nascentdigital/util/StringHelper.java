@@ -1,6 +1,11 @@
 package com.nascentdigital.util;
 
 
+import android.content.Context;
+import android.text.Html;
+import android.text.SpannedString;
+import android.text.TextUtils;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
@@ -224,6 +229,20 @@ public class StringHelper  {
     public static String capitalize(String value){
         if(value.length() == 0) return value;
         return value.substring(0, 1).toUpperCase() + value.substring(1).toLowerCase();
+    }
+
+    /**
+     * Set formatted text with placeholders while keeping the formatting
+     * @param id
+     * @param args
+     * @return
+     */
+    public static CharSequence getFormattedTextWithPlaceholders(int id, Context context, Object...
+            args) {
+        for(int i = 0; i < args.length; ++i)
+            args[i] = args[i] instanceof String ? TextUtils.htmlEncode((String)args[i]) : args[i];
+        return Html.fromHtml(String.format(Html.toHtml(new SpannedString(context.getText(id))),
+                args));
     }
     //endregion
 }
