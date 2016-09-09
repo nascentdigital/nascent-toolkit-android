@@ -261,5 +261,23 @@ public class StringHelper {
 
         return data.toString();
     }
+
+
+    /**
+     * Convert a list to string with a delimiter
+     */
+    public static String listToStringWithDelimiter(List<Object> list, String delimiter) {
+        StringBuilder data = new StringBuilder();
+        for (Object o : list)
+        {
+            if (o == null) {continue;}
+            data.append(o.toString()).append(delimiter);
+        }
+        if (data.length() > 0) {
+            data.deleteCharAt(data.lastIndexOf(delimiter));
+        }
+
+        return data.toString();
+    }
     //endregion
 }
