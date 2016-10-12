@@ -147,7 +147,7 @@ public class StringHelper {
         boolean nextTitleCase = true;
 
         for (char c : input.toCharArray()) {
-            if (Character.isSpaceChar(c)) {
+            if (Character.isSpaceChar(c) || String.valueOf(c).equalsIgnoreCase("-")) {
                 nextTitleCase = true;
             } else if (nextTitleCase) {
                 c = Character.toTitleCase(c);
@@ -266,7 +266,7 @@ public class StringHelper {
     /**
      * Convert a list to string with a delimiter
      */
-    public static String listToStringWithDelimiter(List<Object> list, String delimiter) {
+    public static String listToStringWithDelimiter(List list, String delimiter) {
         StringBuilder data = new StringBuilder();
         for (Object o : list)
         {
