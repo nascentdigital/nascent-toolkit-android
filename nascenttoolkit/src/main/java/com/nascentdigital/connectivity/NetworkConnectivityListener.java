@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -113,6 +115,55 @@ public class NetworkConnectivityListener {
          * another network fails.</li>
          */
         NOT_CONNECTED
+    }
+
+    /**
+     * Some devices seem to get stuck in a weird state where connectivity is not updated
+     * so this method polls the system connectivity manager to update the state.
+     **/
+    public void updateConnectivityStatus() {
+        ConnectivityManager connectivityManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        State isConnected = State.NOT_CONNECTED;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Network[] networks = connectivityManager.getAllNetworks();
+            NetworkInfo networkInfo;
+            for (Network mNetwork : networks) {
+                networkInfo = connectivityManager.getNetworkInfo(mNetwork);
+                if (networkInfo.getState().equals(NetworkInfo.State.CONNECTED) && mCurrentState != State.CONNECTED) {
+                    isConnected = State.CONNECTED;
+                    break;
+                }
+            }
+        }else {
+            if (connectivityManager != null) {
+                //noinspection deprecation
+                NetworkInfo[] info = connectivityManager.getAllNetworkInfo();
+                if (info != null) {
+                    for (NetworkInfo anInfo : info) {
+                        if (anInfo.getState() == NetworkInfo.State.CONNECTED && mCurrentState != State.CONNECTED) {
+                            isConnected = State.CONNECTED;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        if(mCurrentState != isConnected) {
+            mPreviousState = mCurrentState;
+            mCurrentState = isConnected;
+
+            // Notifiy any handlers.
+            Iterator<Handler> it = mHandlers.keySet().iterator();
+            while (it.hasNext()) {
+                Handler target = it.next();
+                Message message = Message.obtain(target, mHandlers.get(target));
+                target.sendMessage(message);
+            }
+        }
     }
 
     /**
