@@ -131,7 +131,7 @@ public class NetworkConnectivityListener {
             NetworkInfo networkInfo;
             for (Network mNetwork : networks) {
                 networkInfo = connectivityManager.getNetworkInfo(mNetwork);
-                if (networkInfo.getState().equals(NetworkInfo.State.CONNECTED) && mCurrentState != State.CONNECTED) {
+                if (networkInfo.getState() == NetworkInfo.State.CONNECTED) {
                     isConnected = State.CONNECTED;
                     break;
                 }
@@ -142,7 +142,7 @@ public class NetworkConnectivityListener {
                 NetworkInfo[] info = connectivityManager.getAllNetworkInfo();
                 if (info != null) {
                     for (NetworkInfo anInfo : info) {
-                        if (anInfo.getState() == NetworkInfo.State.CONNECTED && mCurrentState != State.CONNECTED) {
+                        if (anInfo.getState() == NetworkInfo.State.CONNECTED) {
                             isConnected = State.CONNECTED;
                             break;
                         }
