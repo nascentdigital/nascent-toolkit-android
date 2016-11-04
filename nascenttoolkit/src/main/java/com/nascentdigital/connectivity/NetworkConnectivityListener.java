@@ -121,8 +121,8 @@ public class NetworkConnectivityListener {
      * Some devices seem to get stuck in a weird state where connectivity is not updated
      * so this method polls the system connectivity manager to update the state.
      **/
-    public void updateConnectivityStatus() {
-        ConnectivityManager connectivityManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+    public void updateConnectivityStatus(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         State isConnected = State.NOT_CONNECTED;
 
