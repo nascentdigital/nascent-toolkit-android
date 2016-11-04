@@ -24,6 +24,7 @@ project.properties
 # Android studio project files
 *.iml
 .gradle
+.idea/
 /nascenttoolkit/local.properties
 /nascenttoolkit/.idea/workspace.xml
 /nascenttoolkit/.idea/libraries
